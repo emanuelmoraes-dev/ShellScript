@@ -192,7 +192,7 @@ find ./ -name "arquivo" -exec vim '+%s/texto/textoDaSubistituicao/gc' {} \;
 
 # Subistututir texto em multiplos arquivos com confirmação sem recursao
 
-find ./ -maxdepth 1 -name "arquivo" -exec vim '+%s/texto/textoDaSubistituicao/gc' {} \;x
+find ./ -maxdepth 1 -name "arquivo" -exec vim '+%s/texto/textoDaSubistituicao/gc' {} \;
 
 # Busca as linhas dos arquivos que comtem uma string especificada
 
