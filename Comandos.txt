@@ -383,9 +383,33 @@ export PATH="$PATH:diretorio_java/bin"
 alternatives --config java
 alternatives ---config javac
 
+# Listar Processos Abertos
+
+top
+
 # Listar portas usadas no linux
 
 netstat -antp
+
+# Listar aplicações de uma porta expecífica
+
+lsof -w -n -i tcp:<porta>
+
+OU
+
+fuser -n tcp 8080
+
+OU
+
+netstat -anp | grep :8080
+
+# Matar Processo com PID
+
+kill -9 pid
+
+# Matar Processo com nome
+
+killall <nome do processo>
 
 # Fazer o flex e bison funcionar
 
