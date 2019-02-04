@@ -44,6 +44,7 @@ for p in "$@"; do # Percorre todos os argumentos passados pelo usuário
         param="$p" # 'param' recebe o argumento
 
         if [ "${#args[@]}" = "0" ]; then # Se 'args' estiver vazio
+            >$2 echo "Erro! Argumentos esperados vazio!"
             exit 1 # Finaliza o Script com erro
         fi
 
@@ -58,7 +59,7 @@ for p in "$@"; do # Percorre todos os argumentos passados pelo usuário
         done
 
         if [ "$flag" = "0" ]; then # Se 'param' não foi encontrado em 'args'
-            echo $param
+            >&2 echo "Erro! Parâmetro --$param inválido!"
             exit 2 # finaliza Script com erro
         fi
 
@@ -86,6 +87,7 @@ for p in "$@"; do # Percorre todos os argumentos passados pelo usuário
         
     else
         if [ "${#args[@]}" = "0" ]; then # Se 'args' estiver vazio
+            >$2 echo "Erro! Argumentos esperados vazio!"
             exit 3 # Finaliza Script com erro
         fi
 
