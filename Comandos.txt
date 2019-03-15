@@ -416,3 +416,11 @@ killall <nome do processo>
 sudo apt install flex bison
 
 sudo apt install libfl2 libfl-dev
+
+# Ver tamanho usado de pasta / arquivo
+
+du -hs <arquivo>
+
+# Ver Tamanho livre das partições
+
+df -h
