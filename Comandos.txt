@@ -40,15 +40,11 @@ sudo dnf install --nogpgcheck pacote
 
 sudo pacman -U programa.tar.pkg
 
-# Instalar pacote pkgbuild
-
-makepkg -ci
-
 # Instalar pacote AUR
 
 git clone repositorio_do_aur
 cd pasta_criada
-makepkg -ci
+makepkg -cis
 
 # Instalar programa de código fonte
 
