@@ -1,13 +1,31 @@
 #!/bin/bash
 
-# Script que instala um utilitario para alterar o brilho da tela
-# Requer Zenity instalado
+# 
+# 
 
-# Script criado baseado no trabalho de Rodrigo, cujo link de seu
-# artigo é "http://linuxlike.blogspot.com.br/2012/02/controle-de-brilho-para-o-lubuntu-lxde.html"
+# 
+# "
 
-# Autor: Emanuel Moraes de Almeida
-# email: emanuelmoraes297@gmail.com
+# 
+# 
+
+function helpout {
+    echo "    Script que instala um utilitario para alterar o brilho da tela"
+    echo "    Requer Zenity instalado"
+    echo
+    echo "    Script criado baseado no trabalho de Rodrigo, cujo link de seu"
+    echo "    artigo é \"http://linuxlike.blogspot.com.br/2012/02/controle-de-brilho-para-o-lubuntu-lxde.html\""
+    echo
+    echo "    Autor: Emanuel Moraes de Almeida"
+    echo "    Email: emanuelmoraes297@gmail.com"
+    echo "    Github: https://github.com/emanuelmoraes-dev"
+    echo
+}
+
+if [ "$1" = "--help" ]; then
+    helpout
+    exit 0
+fi
 
 if [ "$(id -u)" != "0" ]; then
     echo "  Erro: usuário não possui permissão administrativa"

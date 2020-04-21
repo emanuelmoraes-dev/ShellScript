@@ -1,0 +1,80 @@
+#!/bin/bash
+
+function helpout {
+    echo "    Script que cria e define o serviço de executar um arquivo com permissões"
+    echo "    administrativas ao iniciar o computador"
+    echo
+    echo "    Para ativar o serviço depois de executado o script, deve-se executar os"
+    echo "    seguinte comandos:"
+    echo
+    echo "    systemctl enable rc-exec-local.service"
+    echo "    systemctl start rc-exec-local.service"
+    echo
+    echo "    Para verificar se o serviço foi ativado, dê o seguinte comando:"
+    echo
+    echo "    systemctl status rc-exec-local.service"
+    echo
+    echo "    Para parar o serviço, dê os seguintes comandos"
+    echo
+    echo "    systemctl stop rc-exec-local.service"
+    echo "    systemctl disable rc-exec-local.service"
+    echo
+    echo "    Script criado tento como base o tutorial: https://www.netroby.com/view/3895"
+    echo
+    echo "    Parâmetro: path do arquivo. Valor padrão: /etc/rc.local"
+    echo
+    echo "    Autor: Emanuel Moraes"
+    echo "    Email: emanuelmoraes297@gmail.com"
+    echo "    Github: https://github.com/emanuelmoraes-dev"
+    echo
+}
+
+if [ "$1" = "--help" ]; then
+    helpout
+    exit 0
+fi
+
+file="$1"
+
+if [ -z "$file" ]; then
+    file="/etc/rc.local"
+fi
+
+echo \
+"[Unit]
+Description=$file Config
+ConditionPathExists=$file
+
+[Service]
+Type=forking
+ExecStart=$file start
+TimeoutSec=0
+StandardOutput=tty
+RemainAfterExit=yes
+SysVStartPriority=99
+
+[Install]
+WantedBy=multi-user.target" > /etc/systemd/system/rc-exec-local.service
+
+echo \
+"#!/bin/sh
+echo  deadline > /sys/block/sda/queue/scheduler" > $file
+
+chmod +x $file
+
+echo "Serviço criado com sucesso!"
+echo
+echo "Para este serviço ser ativo, dê os seguintes comandos:"
+echo
+echo "systemctl enable rc-exec-local.service"
+echo "systemctl start rc-exec-local.service"
+echo
+echo "Para verificar se o serviço foi ativado, dê o seguinte comando:"
+echo
+echo "systemctl status rc-exec-local.service"
+echo
+echo "Para parar o serviço, dê os seguintes comandos"
+echo
+echo "systemctl stop rc-exec-local.service"
+echo "systemctl disable rc-exec-local.service"
+

@@ -1,0 +1,170 @@
+#!/bin/bash
+
+# Script responsável por criar um lançador de aplicativo para uma aplicação
+# qualquer no menu do sistema
+# Autor: Emanuel Moraes
+# Email: emanuelmoraes297@gmail.com
+
+PARAMETER_HELPER=./parameter-helper
+
+function helpout {
+	echo
+	echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
+	echo "    qualquer no menu do sistema. Se o usuário for root, cria-se um arquivo"
+	echo "    \".desktop\" em /usr/share/applications. Caso contrário, cria-se o arquivo"
+	echo "    em $HOME/.local/share/applications"
+	echo
+	echo "    Parâmetros Nomeados:"
+	echo "        --help: Mostra todas as opções. Opcional"
+	echo "        --name: Nome da aplicação a ser exibido no menu. Obrigatório"
+	echo "        --exec: Comando de execução da aplicação. Obrigatório"
+	echo "        --icon: Caminho onde se encontra o ícone da aplicação. Opcional"
+	echo "        --categories: Lista de categorias separadas por ponto e vírgula (;). Opcional"
+	echo "        --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o mesmo valor presente no parâmetro --name"
+	echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave 'Exec'"
+	echo "            do [Desktop Entry]. Opcional"
+	echo
+	echo "    Parâmetros Posicionais:"
+	echo "        0: Equivalente ao parâmetro nomeado --name"
+	echo "        1: Equivalente ao parâmetro nomeado --exec"
+	echo "        2: Equivalente ao parâmetro nomeado --icon"
+	echo "        3: Equivalente ao parâmetro nomeado --categories"
+	echo "        4: Equivalente ao parâmetro nomeado --filename"
+	echo "        5: Equivalente ao parâmetro nomeado --flag-exec"
+	echo
+	echo "    Exemplos de Uso:"
+	echo
+	echo "        gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm"
+	echo "            --categories Development;Java --filename eclipse --flag-exec %f"
+	echo
+	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm Development;Java eclipse %f"
+	echo
+	echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste caso"
+	echo "    os parâmetros nomeados sempre terão preferência, sobrescrevendo os posicionais."
+	echo "    Os parâmetros posicionais não sobrescrevem eles próprios, acumulando os valores"
+	echo "    caso eles seja duplicados"
+	echo
+	echo "    Autor: Emanuel Moraes de Almeida"
+	echo "    Email: emanuelmoraes297@gmail.com"
+	echo "    Github: https://github.com/emanuelmoraes-dev"
+	echo
+}
+
+function join_by {
+	local sep="$1"
+	shift
+	local rt="$1"
+	shift
+
+	for v in "$@"; do
+		rt="${rt}${sep}${v}"
+	done
+
+	printf "$rt\n"
+}
+
+if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	helpout
+	exit 0
+fi
+
+IFS=$'\n'
+args_default=(`$PARAMETER_HELPER --index 0 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_name=(`$PARAMETER_HELPER --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_exec=(`$PARAMETER_HELPER --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_icon=(`$PARAMETER_HELPER --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_categories=(`$PARAMETER_HELPER --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_filename=(`$PARAMETER_HELPER --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_flag_exec=(`$PARAMETER_HELPER --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+IFS=' '
+
+Name="${args_default[0]}"
+Exec="${args_default[1]}"
+Icon="${args_default[2]}"
+Categories="`join_by \; ${args_default[3]}`"
+Filename="${args_default[4]}"
+FlagExec="${args_default[5]}"
+
+if $PARAMETER_HELPER --exists --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	Name="${args_name[@]}"
+fi
+
+if $PARAMETER_HELPER --exists --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	Exec="${args_exec[@]}"
+fi
+
+if $PARAMETER_HELPER --exists --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	Icon="${args_icon[@]}"
+fi
+
+if $PARAMETER_HELPER --exists --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	Categories="`join_by \; ${args_categories[@]}`"
+fi
+
+if $PARAMETER_HELPER --exists --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	Filename="${args_filename[@]}"
+fi
+
+if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+	FlagExec="${args_flag_exec[@]}"
+fi
+
+if [ -z "$Name" ]; then
+	>&2 echo "Erro! --name não informado!"
+	exit 1
+fi
+
+if [ -z "$Exec" ]; then
+	>&2 echo "Erro! --exec não informado!"
+	exit 2
+fi
+
+if [ -z "$Filename" ]; then
+	Filename="$Name"
+fi
+
+function adapter {
+	local rt="$1"
+
+	if ! which "$rt" 1> /dev/null 2> /dev/null && ([[ "$rt" != /* ]] || ! [ -f "$rt" ]); then
+	    rt="${rt// /\\ }"
+		if [ "$(pwd)" = "/" ]; then
+			rt="/$rt"
+		else
+			rt="$(pwd)/$rt"
+		fi
+	fi
+
+	if ! which "$rt" 1> /dev/null 2> /dev/null && ([[ "$rt" != /* ]] || ! [ -f "$rt" ]); then
+		rt="$1"
+	fi
+
+	echo $rt
+}
+
+Exec=$(adapter "$Exec")
+Icon=$(adapter "$Icon")
+
+if [ "$(id -u)" = "0" ]; then
+	echo "\
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=$Name
+Exec=$Exec $FlagExec
+Icon=$Icon
+Categories=$Categories\
+" > "/usr/share/applications/$Filename.desktop"
+else
+	echo "\
+[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Terminal=false
+Name=$Name
+Exec=$Exec $FlagExec
+Icon=$Icon
+Categories=$Categories\
+" > "$HOME/.local/share/applications/$Filename.desktop"
+fi

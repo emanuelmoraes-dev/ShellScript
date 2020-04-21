@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Lista de comandos para Shell Script</title>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.10.2/dist/katex.min.css" integrity="sha384-yFRtMMDnQtDRO8rLpMIKrtPCD5jdktao2TV19YiZYWMDkUR5GQZR/NOVTdquEx1j" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        <link href="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.css" rel="stylesheet" type="text/css">
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        <script src="https://cdn.jsdelivr.net/npm/katex-copytex@latest/dist/katex-copytex.min.js"></script>
+    </head>
+    <body class="vscode-light">
+        <h1 id="lista-de-comandos-para-shell-script">Lista de comandos para Shell Script</h1>
+<ul>
+<li>Autor
+<ul>
+<li>Emanuel Moraes</li>
+</ul>
+</li>
+<li>Email
+<ul>
+<li><a href="mailto:emanuelmoraes297@gmail.com">emanuelmoraes297@gmail.com</a></li>
+</ul>
+</li>
+</ul>
+<h2 id="buscar-programa-pelo-terminal--p-ubuntu-e-derivados">Buscar programa pelo terminal (( p/ Ubuntu e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo apt-cache search &lt;programa&gt;
+</div></code></pre>
+<h2 id="buscar-programa-pelo-terminal--p-fedora-e-derivados">Buscar programa pelo terminal (( p/ fedora e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo dnf search &lt;programa&gt;
+</div></code></pre>
+<h2 id="buscar-programa-pelo-termin-al--p-arch-linux-e-derivados">Buscar programa pelo termin al (( p/ Arch Linux e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo pacman -Ss &lt;programa&gt;
+</div></code></pre>
+<h2 id="instalar-programa-pelo-terminal--p-ubuntu-e-derivados">Instalar programa pelo terminal (( p/ Ubuntu e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo apt-get update
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install &lt;programa&gt;
+</div></code></pre>
+<h2 id="instalar-programa-pelo-terminal--p-fedora-e-derivados">Instalar programa pelo terminal (( p/ fedora e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo dnf install &lt;programa&gt;
+</div></code></pre>
+<h2 id="instalar-programa-pelo-termin-al--p-arch-linux-e-derivados">instalar programa pelo termin al (( p/ Arch Linux e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo pacman -Sy &lt;programa&gt;
+</div></code></pre>
+<h2 id="instalar-pacote-deb">Instalar pacote deb</h2>
+<pre><code class="language-sh"><div>sudo dpkg -i &lt;pacote&gt;.deb
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install -f
+</div></code></pre>
+<h2 id="instalar-pacote-e-depend%c3%aancias-automaticamente-de-um-rpm">Instalar pacote e dependências automaticamente de um rpm</h2>
+<pre><code class="language-sh"><div>sudo dnf install --nogpgcheck &lt;pacote&gt;
+</div></code></pre>
+<h2 id="instalar-pacote-tarpkg">Instalar pacote tar.pkg</h2>
+<pre><code class="language-sh"><div>sudo pacman -U &lt;pacote&gt;.tar.pkg
+</div></code></pre>
+<h2 id="instalar-pacote-aur">Instalar pacote AUR</h2>
+<pre><code class="language-sh"><div>git <span class="hljs-built_in">clone</span> &lt;repositorio_do_aur&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div><span class="hljs-built_in">cd</span> &lt;pasta_criada&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>makepkg -cis
+</div></code></pre>
+<h2 id="instalar-programa-de-c%c3%b3digo-fonte">Instalar programa de código fonte</h2>
+<pre><code class="language-sh"><div>cat readme* | less <span class="hljs-comment"># ler as instruções se houver</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>./configure <span class="hljs-comment"># se houver</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>make
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo make install
+</div></code></pre>
+<h2 id="instalar-driver-de-wifi-para-placas-rtl8723be">INSTALAR DRIVER DE WIFI PARA PLACAS RTL8723BE</h2>
+<pre><code class="language-sh"><div>lspci
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install linux-headers-generic build-essentialgit dkms <span class="hljs-comment"># p/ Ubuntu e derivados</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo dnf install kernel-devel-$(uname -r) git <span class="hljs-comment"># p/ derivados de rpm</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo pacman -S base-devel git linux-headers iw rfkill wireless_tools net-tools <span class="hljs-comment"># p/ Arch Linux</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>git <span class="hljs-built_in">clone</span> http://github.com/lwfinger/rtlwifi_new.git
+</div></code></pre>
+<pre><code class="language-sh"><div><span class="hljs-built_in">cd</span> rtlwifi_new &amp;&amp; make
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo make install
+</div></code></pre>
+<pre><code class="language-sh"><div>make clean
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo nano /etc/modprobe.d/rtl8723be.conf <span class="hljs-comment"># Escrever "options rtl8723be fwlps=0 swlps=0"</span>
+</div></code></pre>
+<h2 id="verificar-se-ext-glob-ex-do-ext-glob-rm-zipiso-est%c3%81-ativado">VERIFICAR SE EXT GLOB (EX DO EXT GLOB: rm !(<em>.zip|</em>.iso)) ESTÁ ATIVADO</h2>
+<pre><code class="language-sh"><div><span class="hljs-built_in">shopt</span> extglob
+</div></code></pre>
+<h2 id="ativa-ext-glob">ATIVA EXT GLOB</h2>
+<pre><code class="language-sh"><div><span class="hljs-built_in">shopt</span> -s extglob
+</div></code></pre>
+<h2 id="desligar-webcam">DESLIGAR WEBCAM</h2>
+<pre><code class="language-sh"><div>sudo modprobe -r uvcvideo
+</div></code></pre>
+<h2 id="ligar-webcam">LIGAR WEBCAM</h2>
+<pre><code class="language-sh"><div>sudo modprobe uvcvideo
+</div></code></pre>
+<h2 id="mudar-ordem-de-grub">MUDAR ORDEM DE GRUB</h2>
+<pre><code class="language-sh"><div>sudo nano /etc/default/grub
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo update-grub <span class="hljs-comment"># p/ Ubuntu e derivados</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo grub-mkconfig -o /boot/grub/grub.cfg <span class="hljs-comment"># p/ linux em geral</span>
+</div></code></pre>
+<h2 id="alterar-senha-root">ALTERAR SENHA ROOT</h2>
+<pre><code class="language-sh"><div>sudo passwd root
+</div></code></pre>
+<h2 id="criar-lan%c3%87ador-de-aplicativo-no-menu">CRIAR LANÇADOR DE APLICATIVO NO MENU</h2>
+<pre><code class="language-sh"><div>su
+</div></code></pre>
+<pre><code class="language-sh"><div><span class="hljs-built_in">cd</span> /usr/share/applications
+</div></code></pre>
+<pre><code class="language-sh"><div><span class="hljs-built_in">echo</span> \
+<span class="hljs-string">"[Desktop Entry]
+Encoding=UTF-8
+Type=Application
+Terminal=true
+Name=&lt;Nome de exibição da aplicação&gt;
+Exec=&lt;Comando para executar aplicação&gt;
+Icon=&lt;Ícone da aplicação&gt;
+Categories=&lt;Categoria 1&gt;;&lt;Categoria 1&gt;
+"</span> &gt;&gt; &lt;arquivo&gt;.desktop
+</div></code></pre>
+<h2 id="montar-iso">MONTAR ISO</h2>
+<pre><code class="language-sh"><div>mount -o loop &lt;sua_Imagem.iso&gt; /media/diretorio_ISO
+</div></code></pre>
+<h2 id="permitir-acesso-root-ao-vlc">PERMITIR ACESSO ROOT AO VLC</h2>
+<pre><code class="language-sh"><div>sudo sed -i <span class="hljs-string">'s/geteuid/getppid/'</span> /usr/bin/vlc
+</div></code></pre>
+<h2 id="remover-conta-de-convidado">REMOVER CONTA DE CONVIDADO</h2>
+<pre><code class="language-sh"><div>sudo nano /usr/share/lightdm/lightdm.conf.d/50-ubuntu.conf <span class="hljs-comment"># Escrever "allow-guest=false"</span>
+</div></code></pre>
+<h2 id="dar-permiss%c3%a3o-para-usu%c3%a1rio-usar-a-impressora">Dar permissão para usuário usar a impressora</h2>
+<pre><code class="language-sh"><div>sudo gpasswd -a &lt;seu usuario&gt; lp
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo gpasswd -a &lt;seu usuario&gt; sys
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo gpasswd -a &lt;seu usuario&gt; scanner
+</div></code></pre>
+<h2 id="instalar-driver-hp--p-ubuntu-e-derivados">Instalar driver HP (( p/ Ubuntu e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo apt-get install cups python-imaging ghostscript hplip
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install cups-filters ghostscript gsfonts
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install simple-scan python-pillow
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo /etc/init.d/cups start
+</div></code></pre>
+<h2 id="instalar-driver-hp--p-arch-linux">Instalar driver hp (( p/ Arch Linux ))</h2>
+<pre><code class="language-sh"><div>sudo pacman -S cups python-imaging ghostscript hplip
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo pacman -S cups-filters ghostscript gsfonts
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo pacman -S simple-scan python-pillow
+</div></code></pre>
+<pre><code class="language-sh"><div>systemctl <span class="hljs-built_in">enable</span> org.cups.cupsd.service
+</div></code></pre>
+<pre><code class="language-sh"><div>systemctl daemon-reload
+</div></code></pre>
+<pre><code class="language-sh"><div>systemctl start org.cups.cupsd.service
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo hp-setup -i
+</div></code></pre>
+<h2 id="instalar-impressora-hp">Instalar impressora HP</h2>
+<pre><code class="language-sh"><div>hp-setup <span class="hljs-comment"># Se nao funcionar tente instalar modo texto com o comando "hp-setup -i"</span>
+</div></code></pre>
+<h2 id="instalar-pacotes-no-arch-linux">Instalar pacotes no arch linux</h2>
+<pre><code class="language-sh"><div>makepkg -cis
+</div></code></pre>
+<h2 id="instalar-chave-p%c3%bablica">Instalar chave pública</h2>
+<pre><code class="language-sh"><div>gpg --recv-keys &lt;chave&gt;
+</div></code></pre>
+<h2 id="arch-inserir-linguagens">Arch inserir linguagens</h2>
+<pre><code class="language-sh"><div>nano /etc/locale.gen <span class="hljs-comment"># Descomente a linguagem desejada. Recomenda-se fortemente deixar também o ingles</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo locale-gen
+</div></code></pre>
+<h2 id="substituir-texto-em-multiplos-arquivos">Substituir texto em multiplos arquivos</h2>
+<pre><code class="language-sh"><div>find &lt;pasta&gt; -iname &lt;nome <span class="hljs-keyword">do</span> arquivo&gt; -<span class="hljs-built_in">type</span> f -print0 | xargs -0 sed -i <span class="hljs-string">'s/&lt;texto1&gt;/&lt;texto2&gt;/g'</span>
+</div></code></pre>
+<h2 id="substituir-texto-em-multiplos-arquivos-com-confirma%c3%a7%c3%a3o">Substituir texto em multiplos arquivos com confirmação</h2>
+<pre><code class="language-sh"><div>find ./ -name &lt;arquivo&gt; -<span class="hljs-built_in">exec</span> vim <span class="hljs-string">'+%s/&lt;texto&gt;/&lt;texto da substitução&gt;/gc'</span> {} \;
+</div></code></pre>
+<h2 id="substituir-texto-em-multiplos-arquivos-com-confirma%c3%a7%c3%a3o-sem-recursao">Substituir texto em multiplos arquivos com confirmação sem recursao</h2>
+<pre><code class="language-sh"><div>find ./ -maxdepth 1 -name &lt;arquivo&gt; -<span class="hljs-built_in">exec</span> vim <span class="hljs-string">'+%s/&lt;texto&gt;/&lt;texto da subistituicao&gt;/gc'</span> {} \;
+</div></code></pre>
+<h2 id="busca-as-linhas-dos-arquivos-que-comtem-uma-string-especificada">Busca as linhas dos arquivos que comtem uma string especificada</h2>
+<pre><code class="language-sh"><div>find ./ -<span class="hljs-built_in">type</span> f -name &lt;arquivo&gt; -<span class="hljs-built_in">exec</span> grep -l -i &lt;texto&gt; {} \;
+</div></code></pre>
+<h2 id="alterar-a%c3%a7%c3%a3o-do-fechamento-da-tampa--gnome">Alterar ação do fechamento da tampa (( Gnome ))</h2>
+<pre><code class="language-sh"><div>sudo nano /etc/systemd/logind.conf <span class="hljs-comment"># procurar/inserir o texto "HandleLidSwitch='ops'" ops: "ignore" "poweroff" "reboot" "suspend" "hibernate" "lock"</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>systemctl restart systemd-logind
+</div></code></pre>
+<h2 id="encerrar-sess%c3%a3o--gnome">Encerrar Sessão (( Gnome ))</h2>
+<pre><code class="language-sh"><div>gnome-session-quit
+</div></code></pre>
+<h2 id="encerrar-sess%c3%a3o">Encerrar Sessão</h2>
+<pre><code class="language-sh"><div>sudo pkill -9 -u username
+</div></code></pre>
+<h2 id="conectar-a-cabo-de-internet">Conectar a cabo de internet</h2>
+<pre><code class="language-sh"><div>ifconfig -a
+</div></code></pre>
+<pre><code class="language-sh"><div>dhcpcd &lt;interface&gt; <span class="hljs-comment"># Opção 1</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>dhclient &lt;interface&gt; <span class="hljs-comment"># Opção 2</span>
+</div></code></pre>
+<h2 id="conectar-a-cabo-de-internet-arch-linux">Conectar a cabo de internet Arch Linux</h2>
+<pre><code class="language-sh"><div>Systemctl start dhcpcd
+</div></code></pre>
+<h2 id="conectar-a-wifi">Conectar a wifi</h2>
+<pre><code class="language-sh"><div>iwconfig
+</div></code></pre>
+<pre><code class="language-sh"><div>iwlist scan <span class="hljs-comment"># se nao funcionar antes digite ifup &lt;interface&gt; ctrl + c</span>
+</div></code></pre>
+<h3 id="rede-aberta-opn">Rede aberta (OPN)</h3>
+<pre><code class="language-sh"><div>iwconfig &lt;interface&gt; essid &lt;nome da rede&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>dhclient &lt;interface&gt;
+</div></code></pre>
+<h3 id="rede-encriptada-wep">Rede encriptada (WEP)</h3>
+<pre><code class="language-sh"><div>iwconfig &lt;interface&gt; mode managed key &lt;senha&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>iwconfig &lt;interface&gt; essid &lt;nome da rede&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>dhclient &lt;interface&gt;
+</div></code></pre>
+<h3 id="rede-encriptada-2---a-vingan%c3%a7a--wpawpa2">Rede encriptada 2 - A Vingança :) (WPA/WPA2)</h3>
+<pre><code class="language-sh"><div>wpa_passphrase &lt;nome da rede&gt; &gt; /&lt;caminho <span class="hljs-keyword">do</span> arquivo&gt;.conf
+</div></code></pre>
+<pre><code class="language-sh"><div>wpa_supplicant -Dwext -i&lt;interface&gt; -c /&lt;caminho <span class="hljs-keyword">do</span> arquivo&gt;.conf <span class="hljs-comment"># se der certo de ctrl + c</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>wpa_supplicant -Dwext -i&lt;interface&gt; -c /&lt;caminho <span class="hljs-keyword">do</span> arquivo&gt;.conf -B
+</div></code></pre>
+<pre><code class="language-sh"><div>dhclient -r
+</div></code></pre>
+<pre><code class="language-sh"><div>dhclient &lt;interface&gt;
+</div></code></pre>
+<h2 id="create-binary-by-file">Create Binary by file</h2>
+<pre><code class="language-sh"><div>od -An -vtx1 &lt;arquivo&gt; &gt; &lt;arquivo&gt;.txt
+</div></code></pre>
+<h2 id="command-create-file-by-binary">Command Create file by binary</h2>
+<pre><code class="language-sh"><div>LC_ALL=C tr -<span class="hljs-built_in">cd</span> 0-9a-fA-F &lt; &lt;arquivo&gt;.txt | xxd -r -p &gt; &lt;arquivo&gt;
+</div></code></pre>
+<h2 id="create-live-usb-bootable">Create Live Usb Bootable</h2>
+<pre><code class="language-sh"><div>sudo dd <span class="hljs-keyword">if</span>=&lt;path&gt;.iso of=/dev/sd&lt;X&gt; bs=&lt;8M&gt; status=progress oflag=direct
+</div></code></pre>
+<h2 id="criar-iso-de-arquivos">Criar ISO de arquivos</h2>
+<pre><code class="language-sh"><div>mkisofs -o &lt;path&gt;.iso &lt;diretório de arquivos&gt;
+</div></code></pre>
+<h2 id="criar-iso-de-cddvd">Criar ISO de CD/DVD</h2>
+<pre><code class="language-sh"><div>dd <span class="hljs-keyword">if</span>=/dev/&lt;cdrom&gt; of=&lt;path&gt;.iso
+</div></code></pre>
+<h2 id="reinstalar-drivers-de-som--p-ubuntu-e-derivados">Reinstalar drivers de som (( p/ Ubuntu e derivados ))</h2>
+<pre><code class="language-sh"><div>sudo apt-get remove alsa-utils
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get remove alsamixer
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get purge pulseaudio
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get clean
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get autoremove
+</div></code></pre>
+<pre><code class="language-sh"><div>rm -r ~/.pulse ~/.asound* ~/.pulse-cookie ~/.config/pulse
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install alsa-utils
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install alsamixer
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt-get install pulseaudio
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo alsa force-reload pavucontrol
+</div></code></pre>
+<h2 id="descompactar-arquivos-compactados">Descompactar arquivos compactados</h2>
+<h3 id="targz">tar.gz</h3>
+<pre><code class="language-sh"><div>tar -xvzf &lt;arquivo&gt;.tar.gz -C &lt;path destino&gt;
+</div></code></pre>
+<h3 id="tarbz2">tar.bz2</h3>
+<pre><code class="language-sh"><div>tar -xvjf &lt;arquivo&gt;.tar.bz2 -C &lt;path destino&gt;
+</div></code></pre>
+<h3 id="tarxz--precisa-do-pacote-xz-utils">tar.xz (( precisa do pacote xz-utils ))</h3>
+<pre><code class="language-sh"><div>tar -xvJf &lt;arquivo&gt;.tar.xz -C &lt;path destino&gt;
+</div></code></pre>
+<h3 id="zip">zip</h3>
+<pre><code class="language-sh"><div>unzip &lt;arquivo&gt;.zip -d &lt;path destino&gt;
+</div></code></pre>
+<h3 id="rar">rar</h3>
+<pre><code class="language-sh"><div>unrar e &lt;arquivo&gt;.rar &lt;pathdestino&gt; <span class="hljs-comment"># Opção 1</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>unrar x &lt;arquivo&gt;.rar <span class="hljs-comment"># Opção 2</span>
+</div></code></pre>
+<h2 id="compactar-arquivos">Compactar arquivos</h2>
+<h3 id="targz---op%c3%a7%c3%a3o-1">tar.gz - Opção 1</h3>
+<pre><code class="language-sh"><div>tar -cvzf &lt;arquivo&gt;.tar.gz &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<h3 id="targz---op%c3%a7%c3%a3o-2">tar.gz - Opção 2</h3>
+<pre><code class="language-sh"><div>tar -cvf &lt;arquivo&gt;.tar &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>gzip -9 &lt;arquivo&gt;.tar
+</div></code></pre>
+<h3 id="tarbz2---op%c3%a7%c3%a3o-1">tar.bz2 - Opção 1</h3>
+<pre><code class="language-sh"><div>tar -cvjf &lt;arquivo&gt;.tar.bz2 &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<h3 id="tarbz2---op%c3%a7%c3%a3o-2">tar.bz2 - Opção 2</h3>
+<pre><code class="language-sh"><div>tar -cvf &lt;arquivo&gt;.tar &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<pre><code class="language-sh"><div>bzip2 &lt;arquivo&gt;.tar
+</div></code></pre>
+<h3 id="tarxz">tar.xz</h3>
+<pre><code class="language-sh"><div>tar -cvJf &lt;arquivo&gt;.tar.xz &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<h3 id="zip-1">zip</h3>
+<pre><code class="language-sh"><div>zip &lt;arquivo&gt;.zip &lt;arquivo ou pasta a compactar&gt; <span class="hljs-comment"># Opção 1</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>zip -r &lt;arquivo&gt;.zip &lt;arquivo ou pasta a compactar&gt; <span class="hljs-comment"># Opção 2</span>
+</div></code></pre>
+<h3 id="rar-1">rar</h3>
+<pre><code class="language-sh"><div>rar a &lt;arquivo&gt;.rar &lt;arquivo ou pasta a compactar&gt;
+</div></code></pre>
+<h2 id="desativar-temporariamente-um-dispositivo-de-entrada">Desativar temporariamente um dispositivo de entrada</h2>
+<pre><code class="language-sh"><div>xinput list <span class="hljs-comment"># lista os dispositivos de entrada</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>xinput <span class="hljs-built_in">float</span> &lt;id&gt; <span class="hljs-comment"># Desativa temporariamente o dispositivo com o id informado</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>xinput reattach &lt;id&gt; &lt;slave keyboard&gt; <span class="hljs-comment"># ativa o dispositivo com o id informado e com o numero slave keybord informado</span>
+</div></code></pre>
+<h2 id="desativar-permanentemente-um-dispositivo-de-entrada">Desativar permanentemente um dispositivo de entrada</h2>
+<pre><code class="language-sh"><div>sudo cp /etc/default/grub /etc/default/grub.original <span class="hljs-comment"># Cria um arquivo de backup para reverter o processo</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo nano /etc/default/grub <span class="hljs-comment"># Localize a linua 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"' e substitua por 'GRUB_CMDLINE_LINUX_DEFAULT="quiet splash i8042.nokbd"'</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo update-grub
+</div></code></pre>
+<h2 id="reverter-o-procedimento-anterior">Reverter o procedimento anterior</h2>
+<pre><code class="language-sh"><div>sudo cp /etc/default/grub.original /etc/default/grub
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo update-grub
+</div></code></pre>
+<h2 id="listar-processos-abertos">Listar Processos Abertos</h2>
+<pre><code class="language-sh"><div>top
+</div></code></pre>
+<h2 id="listar-portas-usadas-no-linux">Listar portas usadas no linux</h2>
+<pre><code class="language-sh"><div>netstat -antp
+</div></code></pre>
+<h2 id="listar-aplica%c3%a7%c3%b5es-de-uma-porta-expec%c3%adfica">Listar aplicações de uma porta expecífica</h2>
+<pre><code class="language-sh"><div>lsof -w -n -i tcp:&lt;porta&gt; <span class="hljs-comment"># Opção 1</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>fuser -n tcp &lt;porta&gt; <span class="hljs-comment"># Opção 2</span>
+</div></code></pre>
+<pre><code class="language-sh"><div>netstat -anp | grep :&lt;porta&gt; <span class="hljs-comment"># Opção 3</span>
+</div></code></pre>
+<h2 id="matar-processo-com-pid">Matar Processo com PID</h2>
+<pre><code class="language-sh"><div><span class="hljs-built_in">kill</span> -9 &lt;pid&gt;
+</div></code></pre>
+<h2 id="matar-processo-com-nome">Matar Processo com nome</h2>
+<pre><code class="language-sh"><div>killall &lt;nome <span class="hljs-keyword">do</span> processo&gt;
+</div></code></pre>
+<h2 id="instalar-flex-e-bison">Instalar flex e bison</h2>
+<pre><code class="language-sh"><div>sudo apt install flex bison
+</div></code></pre>
+<pre><code class="language-sh"><div>sudo apt install libfl2 libfl-dev
+</div></code></pre>
+<h2 id="ver-tamanho-usado-de-pasta--arquivo">Ver tamanho usado de pasta / arquivo</h2>
+<pre><code class="language-sh"><div>du -hs &lt;arquivo&gt;
+</div></code></pre>
+<h2 id="ver-tamanho-livre-das-parti%c3%a7%c3%b5es">Ver Tamanho livre das partições</h2>
+<pre><code class="language-sh"><div>df -h
+</div></code></pre>
+
+    </body>
+    </html>

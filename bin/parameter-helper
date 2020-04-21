@@ -1,0 +1,164 @@
+#!/bin/bash
+# Autor: Emanuel Moraes de Almeida
+# Email: emanuelmoraes297@gmail.com
+# github: github.com/emanuelmoraes-dev
+
+function helpout {
+	echo
+	echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros nomeados"
+	echo "    e separar os valores de seus parâmetros"
+	echo
+	echo "    Parâmetros:"
+	echo "        --index = Posição do parâmetro na qual será retornado seus valores. Valor padrão: 0"
+    echo "        --sep = Separador utilizado para separar os vários elementos"
+	echo "            de um array de valores passados pelo usuário. Valor padrão: \$'\n'"
+    echo "        --is-param = String na qual todos os parâmetros nomeados devem começar. Este"
+    echo "            parâmetro deve sempre vir antes do parâmetro --params. Valor padrão: -"
+	echo "        --params = Nomes dos parâmetros esperados para o usuário passar"
+    echo "            (ignorando o valor de --is-param, que por padrão é '-'). Obrigatório"
+    echo "        -- = Informa que os argumentos começarão a ser analizados. Obrigatório"
+	echo
+	echo "    Exemplo de uso:"
+	echo "        IFS=$'\n' # Separador padrão"
+    echo
+	echo "        v1=(\`./parameter-helper --index 0 --params -v1 -nomes -idades -- --idades 18 20 --nomes Emanuel Pedro\`) # Array vazio"
+    echo
+    echo "        v1=(\`./parameter-helper --is-param @ --index 0 --params v1 nomes idades -- @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro\`) # Array com '1', '2' e '3'"
+    echo
+	echo "        nomes=(\`./parameter-helper --index 1 --params -v1 -nomes -idades -- --idades 18 20 --nomes Emanuel Pedro\`) # Array com 'Emanuel' e 'Pedro'"
+    echo
+    echo
+	echo "        IFS='+' # Separador passado no parâmetro '--sep'"
+    echo
+	echo "        idades=(\`./parameter-helper --sep + --index 2 --params -v1 -nomes -idades -- --idades 18 20 --nomes Emanuel Pedro\`) # Array com '18' e '20'"
+    echo
+	echo "        IFS=' ' # Volta ao separador padrão do sistema"
+	echo
+	echo "    Autor: Emanuel Moraes de Almeida"
+	echo "    Email: emanuelmoraes297@gmail.com"
+	echo "    Github: https://github.com/emanuelmoraes-dev"
+	echo
+}
+
+if [ "$1" = "--help" ]; then
+    helpout # Executa função de ajuda na saída padrão
+	exit 0 # Finaliza Script com Sucesso!
+fi
+
+function contains {
+    local target=""
+    local index=0
+    local flag=0
+
+    for key in "$@"; do
+        if [ $index -eq 0 ]; then
+            target="$key"
+        elif [ "$key" = "$target" ]; then
+            flag=1
+            break
+        fi
+
+        let index=$index+1
+    done
+
+    if [ $flag -eq 0 ]; then
+        return 1
+    fi
+
+    return 0
+}
+
+start_args=0 # Flag para indicar se o parâmetro -- já foi lido
+present_exists=0 # Flag para indicar se o parâmetro "--exists" está presente
+param="" # Parâmetro atual na qual está sendo extraído seus valores
+index="0" # Posição do parâmetro que terá seus valores retornados
+sep=$'\n' # Separador utilizado para separar os vários elementos de um array de valores passados pelo usuário
+is_param="-" # String na qual todos os parâmetros nomeados devem começar
+params=() # Parâmetros que serão esperados
+used_params=() # Parâmetros nomeados usados
+resp=() # Array Resposta do Script
+
+for a in "$@"; do # Percorre todos os argumentos passados pelo usuário
+
+    if [ $start_args -eq 0 ] && (
+        [ "$a" = "--params" ] ||
+        [ "$a" = "--index" ] ||
+        [ "$a" = "--sep" ] ||
+        [ "$a" = "--exists" ] ||
+        [ "$a" = "--is-param" ] ||
+        [ "$a" = "--" ]
+    ); then
+
+        param="$a"
+
+        if [ "$a" = "--index" ]; then
+            index=0
+        elif [ "$a" = "--sep" ]; then
+            sep=$'\n'
+        elif [ "$a" = "--exists" ]; then
+            present_exists=1
+        elif [ "$a" = "--is-param" ]; then
+            is_param="-"
+        elif [ "$a" = "--" ]; then
+            start_args=1
+        fi
+
+    elif [ $start_args -eq 0 ] && [ "$param" = "--index" ]; then
+
+        index="$a"
+	
+	elif [ $start_args -eq 0 ] && [ "$param" = "--sep" ]; then
+
+		sep="$a"
+
+    elif [ $start_args -eq 0 ] && [ "$param" = "--is-param" ]; then
+
+        is_param="$a"
+
+    elif [ $start_args -eq 0 ] && [ "$param" = "--params" ]; then # Se 'param' é o parâmetro para setar os parâmetros
+
+        len=${#params[@]} # Tamanho do array
+        params[$len]="${is_param}${a}" # Adiciona no fim do array de 'params' o argumento
+        resp[$len]="" # Adiciona no fim do array de 'resp' uma string vazia
+
+    elif [ $start_args -eq 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
+
+        if contains "$a" "${params[@]}"; then
+            param="$a" # 'param' recebe o argumento
+            len_used_params=${#used_params[@]} # Tamanho do array "used_params"
+            used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
+        else
+            # >$2 echo "Erro! '--params' vazio!"
+            exit 1 # Finaliza Script com erro
+        fi
+
+    elif [ $start_args -eq 1 ]; then
+        if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
+            # >$2 echo "Erro! '--params' vazio!"
+            exit 2 # Finaliza Script com erro
+        fi
+
+        len=${#params[@]}
+        for ((i=0 ; i < len ; i++)); do # Percorre a lista de parâmetros
+            local_param="${params[i]}"
+            if [ "$param" = "$local_param" ]; then # Se o 'param' foi encontrado na lista de parâmetros
+                if [ -z "${resp[$i]}" ]; then
+                    resp[$i]="$a" # Um novo valor para o parâmetro de posição 'i'
+                else
+                    resp[$i]="${resp[$i]}${sep}${a}" # Um novo valor para o parâmetro de posição 'i'
+                fi
+
+                break # Finaliza loop
+            fi
+        done
+    else
+        # >$2 echo "Erro! Argumentos Inválidos!"
+        exit 3 # Finaliza Script com erro
+    fi
+done
+
+if [ $present_exists -eq 0 ]; then
+    printf "%s\n" "${resp[index]}" # Retorna os valores do parâmetro da posição '--index'
+else
+    contains "${params[index]}" "${used_params[@]}"
+fi
