@@ -63,19 +63,19 @@ function join_by {
 	printf "$rt\n"
 }
 
-if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	helpout
 	exit 0
 fi
 
 IFS=$'\n'
-args_default=(`$PARAMETER_HELPER --index 0 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_name=(`$PARAMETER_HELPER --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_exec=(`$PARAMETER_HELPER --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_icon=(`$PARAMETER_HELPER --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_categories=(`$PARAMETER_HELPER --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_filename=(`$PARAMETER_HELPER --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
-args_flag_exec=(`$PARAMETER_HELPER --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"`)
+args_default=(`$PARAMETER_HELPER --index 0 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_name=(`$PARAMETER_HELPER --index 1 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_exec=(`$PARAMETER_HELPER --index 2 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_icon=(`$PARAMETER_HELPER --index 3 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_categories=(`$PARAMETER_HELPER --index 4 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_filename=(`$PARAMETER_HELPER --index 5 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_flag_exec=(`$PARAMETER_HELPER --index 6 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
 IFS=' '
 
 Name="${args_default[0]}"
@@ -85,27 +85,27 @@ Categories="`join_by \; ${args_default[3]}`"
 Filename="${args_default[4]}"
 FlagExec="${args_default[5]}"
 
-if $PARAMETER_HELPER --exists --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 1 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	Name="${args_name[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 2 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	Exec="${args_exec[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 3 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	Icon="${args_icon[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 4 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	Categories="`join_by \; ${args_categories[@]}`"
 fi
 
-if $PARAMETER_HELPER --exists --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 5 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	Filename="${args_filename[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -- --default "$@"; then
+if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
 	FlagExec="${args_flag_exec[@]}"
 fi
 
