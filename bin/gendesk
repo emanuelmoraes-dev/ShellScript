@@ -17,10 +17,13 @@ function helpout {
 	echo "    Parâmetros Nomeados:"
 	echo "        --help: Mostra todas as opções. Opcional"
 	echo "        --name: Nome da aplicação a ser exibido no menu. Obrigatório"
-	echo "        --exec: Comando de execução da aplicação. Obrigatório"
+	echo "        --exec: Comando de execução da aplicação. Obrigatório (é altamente recomendado"
+	echo "            que flags, como o %f, não sejam inseridos aqui. Caso alguma flag seja necessária, "
+	echo "            insira ela no parâmetro --flag-exec)"
 	echo "        --icon: Caminho onde se encontra o ícone da aplicação. Opcional"
-	echo "        --categories: Lista de categorias separadas por ponto e vírgula (;). Opcional"
-	echo "        --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o mesmo valor presente no parâmetro --name"
+	echo "        --categories: Lista de categorias separadas por espaço. Opcional"
+	echo "        --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o"
+	echo "            mesmo valor presente no parâmetro --name"
 	echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave 'Exec'"
 	echo "            do [Desktop Entry]. Opcional"
 	echo
@@ -35,19 +38,42 @@ function helpout {
 	echo "    Exemplos de Uso:"
 	echo
 	echo "        gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm"
-	echo "            --categories Development;Java --filename eclipse --flag-exec %f"
+	echo "            --categories Development Java --filename eclipse --flag-exec %f"
 	echo
-	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm Development;Java eclipse %f"
+	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse %f"
 	echo
 	echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste caso"
 	echo "    os parâmetros nomeados sempre terão preferência, sobrescrevendo os posicionais."
 	echo "    Os parâmetros posicionais não sobrescrevem eles próprios, acumulando os valores"
 	echo "    caso eles seja duplicados"
 	echo
-	echo "    Autor: Emanuel Moraes de Almeida"
-	echo "    Email: emanuelmoraes297@gmail.com"
-	echo "    Github: https://github.com/emanuelmoraes-dev"
-	echo
+	
+	if [ "$1" = "autor" ]; then
+		echo "    Autor: Emanuel Moraes de Almeida"
+		echo "    Email: emanuelmoraes297@gmail.com"
+		echo "    Github: https://github.com/emanuelmoraes-dev"
+		echo
+	fi
+}
+
+function helperr {
+	local err=$?
+
+	if [ "$2" ]; then
+		err="$2"
+	elif [ -z "$err" ]; then
+		err=200
+	fi
+
+	local message="$1"
+
+	if [ -z "$message" ]; then
+		message="Erro! Argumentos Inválidos"
+	fi
+
+	>&2 helpout
+	>&2 printf "\n$message\n\n"
+	exit $err
 }
 
 function join_by {
@@ -63,8 +89,14 @@ function join_by {
 	printf "$rt\n"
 }
 
+if [ $# -eq 0 ]; then
+	helperr "Erro! Argumentos vazios" 100
+fi
+
+$PARAMETER_HELPER --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@" || helperr
+
 if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
-	helpout
+	helpout autor
 	exit 0
 fi
 
@@ -110,13 +142,11 @@ if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -cat
 fi
 
 if [ -z "$Name" ]; then
-	>&2 echo "Erro! --name não informado!"
-	exit 1
+	helperr "Erro! --name não informado!" 101
 fi
 
 if [ -z "$Exec" ]; then
-	>&2 echo "Erro! --exec não informado!"
-	exit 2
+	helperr "Erro! --exec não informado!" 102
 fi
 
 if [ -z "$Filename" ]; then
