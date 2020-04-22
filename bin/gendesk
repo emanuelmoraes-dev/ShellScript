@@ -1,6 +1,6 @@
 #!/bin/bash
 
-PARAMETER_HELPER=./parameter-helper
+PARAMETER_HELPER=parameter-helper
 
 function helpout {
 	echo
