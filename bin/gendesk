@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# Script responsável por criar um lançador de aplicativo para uma aplicação
-# qualquer no menu do sistema
-# Autor: Emanuel Moraes
-# Email: emanuelmoraes297@gmail.com
-
 PARAMETER_HELPER=./parameter-helper
 
 function helpout {

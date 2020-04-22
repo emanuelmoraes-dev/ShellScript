@@ -1,7 +1,4 @@
 #!/bin/bash
-# Autor: Emanuel Moraes de Almeida
-# Email: emanuelmoraes297@gmail.com
-# github: github.com/emanuelmoraes-dev
 
 function helpout {
 	echo

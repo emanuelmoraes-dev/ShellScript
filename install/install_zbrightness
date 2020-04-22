@@ -1,14 +1,5 @@
 #!/bin/bash
 
-# 
-# 
-
-# 
-# "
-
-# 
-# 
-
 function helpout {
     echo "    Script que instala um utilitario para alterar o brilho da tela"
     echo "    Requer Zenity instalado"
