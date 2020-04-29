@@ -1,7 +1,5 @@
 #!/bin/bash
 
-PARAMETER_HELPER=parameter-helper
-
 function helpout {
 	echo
 	echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
@@ -84,8 +82,20 @@ function join_by {
 	printf "$rt\n"
 }
 
+DIRNAME=`dirname "$0"`
+PARAMETER_HELPER="$DIRNAME/parameter-helper"
+
+if ! [ -f "$PARAMETER_HELPER" ]; then
+	if which "parameter-helper" 1> /dev/null 2> /dev/null; then
+		PARAMETER_HELPER="parameter-helper"
+	else
+		>&2 echo "Erro! \"$DIRNAME/parameter-helper\" não encontrado!"
+		exit 100
+	fi
+fi
+
 if [ $# -eq 0 ]; then
-	helperr "Erro! Argumentos vazios" 100
+	helperr "Erro! Argumentos vazios" 101
 fi
 
 $PARAMETER_HELPER --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@" || helperr
@@ -137,11 +147,11 @@ if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -cat
 fi
 
 if [ -z "$Name" ]; then
-	helperr "Erro! --name não informado!" 101
+	helperr "Erro! --name não informado!" 102
 fi
 
 if [ -z "$Exec" ]; then
-	helperr "Erro! --exec não informado!" 102
+	helperr "Erro! --exec não informado!" 103
 fi
 
 if [ -z "$Filename" ]; then
