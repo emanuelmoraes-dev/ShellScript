@@ -19,6 +19,7 @@ function helpout {
 	echo "            mesmo valor presente no parâmetro --name"
 	echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave 'Exec'"
 	echo "            do [Desktop Entry]. Opcional"
+	echo "        --comment: Comentário sobre a aplicação. Opcional"
 	echo
 	echo "    Parâmetros Posicionais:"
 	echo "        0: Equivalente ao parâmetro nomeado --name"
@@ -27,13 +28,16 @@ function helpout {
 	echo "        3: Equivalente ao parâmetro nomeado --categories"
 	echo "        4: Equivalente ao parâmetro nomeado --filename"
 	echo "        5: Equivalente ao parâmetro nomeado --flag-exec"
+	echo "        6: Equivalente ao parâmetro nomeado --comment (se --flag-exec não existir,"
+	echo "            deve ser passado para --flag-exec um espaçamento)"
 	echo
 	echo "    Exemplos de Uso:"
 	echo
-	echo "        gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm"
-	echo "            --categories Development Java --filename eclipse --flag-exec %f"
+	echo "        gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm --categories Development Java --filename eclipse --flag-exec %f --comment IDE para desenvolvedores Java"
 	echo
-	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse %f"
+	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse %f \"IDE para desenvolvedores Java\""
+	echo
+	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse \" \" \"IDE para desenvolvedores Java\""
 	echo
 	echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste caso"
 	echo "    os parâmetros nomeados sempre terão preferência, sobrescrevendo os posicionais."
@@ -98,21 +102,22 @@ if [ $# -eq 0 ]; then
 	helperr "Erro! Argumentos vazios" 101
 fi
 
-$PARAMETER_HELPER --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@" || helperr
+$PARAMETER_HELPER --params -help -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@" || helperr
 
-if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 0 --params -help -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	helpout autor
 	exit 0
 fi
 
 IFS=$'\n'
-args_default=(`$PARAMETER_HELPER --index 0 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_name=(`$PARAMETER_HELPER --index 1 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_exec=(`$PARAMETER_HELPER --index 2 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_icon=(`$PARAMETER_HELPER --index 3 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_categories=(`$PARAMETER_HELPER --index 4 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_filename=(`$PARAMETER_HELPER --index 5 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
-args_flag_exec=(`$PARAMETER_HELPER --index 6 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"`)
+args_default=(`$PARAMETER_HELPER --index 0 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_name=(`$PARAMETER_HELPER --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_exec=(`$PARAMETER_HELPER --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_icon=(`$PARAMETER_HELPER --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_categories=(`$PARAMETER_HELPER --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_filename=(`$PARAMETER_HELPER --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_flag_exec=(`$PARAMETER_HELPER --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
+args_comment=(`$PARAMETER_HELPER --index 7 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"`)
 IFS=' '
 
 Name="${args_default[0]}"
@@ -121,29 +126,34 @@ Icon="${args_default[2]}"
 Categories="`join_by \; ${args_default[3]}`"
 Filename="${args_default[4]}"
 FlagExec="${args_default[5]}"
+Comment="${args_default[6]}"
 
-if $PARAMETER_HELPER --exists --index 1 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 1 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	Name="${args_name[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 2 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 2 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	Exec="${args_exec[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 3 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 3 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	Icon="${args_icon[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 4 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 4 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	Categories="`join_by \; ${args_categories[@]}`"
 fi
 
-if $PARAMETER_HELPER --exists --index 5 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 5 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	Filename="${args_filename[@]}"
 fi
 
-if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -categories -filename -flag-exec @@ --default "$@"; then
+if $PARAMETER_HELPER --exists --index 6 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
 	FlagExec="${args_flag_exec[@]}"
+fi
+
+if $PARAMETER_HELPER --exists --index 7 --params -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@"; then
+	Comment="${args_comment[@]}"
 fi
 
 if [ -z "$Name" ]; then
@@ -189,7 +199,8 @@ Terminal=false
 Name=$Name
 Exec=$Exec $FlagExec
 Icon=$Icon
-Categories=$Categories\
+Categories=$Categories
+Comment=$Comment\
 " > "/usr/share/applications/$Filename.desktop"
 else
 	echo "\
@@ -200,6 +211,7 @@ Terminal=false
 Name=$Name
 Exec=$Exec $FlagExec
 Icon=$Icon
-Categories=$Categories\
+Categories=$Categories
+Comment=$Comment\
 " > "$HOME/.local/share/applications/$Filename.desktop"
 fi
