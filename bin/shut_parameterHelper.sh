@@ -24,14 +24,19 @@ function _shut_parameterHelper_helpout {
 	echo
     echo "    Exemplo 1:"
     echo "        source parameter-helper --sep + --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro"
+    echo
     echo "        shut_util_array + \"\${shut_parameterHelper_args[2]}\""
+    echo
     echo "        idades=(\"\${shut_util_return[@]}\") # Array de tamanho 3 com os valores '' '20' e '40'"
     echo
 	echo "    Exemplo 2:"
     echo "        # Se o parâmetro --v1 foi passado"
     echo "        if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then"
+    echo
     echo "            source parameter-helper"
+    echo
     echo "            shut_util_array $'\n' \"\`parameter-helper --out --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro\`\""
+    echo
 	echo "            v1=(\"\${shut_util_return[@]}\") # Array com '1', '2' e '3'"
     echo "        fi"
     echo
@@ -39,17 +44,22 @@ function _shut_parameterHelper_helpout {
 	echo "        source parameter-helper --create-exists-array --params -v1 -nomes -idades @@ --idades 18 20 --nomes Emanuel Pedro"
     echo
     echo "        shut_util_array $'\n' \"\${shut_parameterHelper_args[0]}\""
+    echo
 	echo "        v1=(\"\${shut_util_return[@]}\") # Array vazio"
     echo
     echo "        # Se o parâmetro --nome foi passado"
     echo "        if [ \"\${shut_parameterHelper_exists[1]}\" -eq 1 ]; then"
+    echo
     echo "            shut_util_array $'\n' \"\${shut_parameterHelper_args[1]}\""
+    echo
 	echo "            nome=(\"\${shut_util_return[@]}\") # Array com 'Emanuel' e 'Pedro'"
     echo "        fi"
     echo
     echo "    Exemplo 4: (Argumentos com string vazias são ignoradas nesta forma de uso)"
 	echo "        IFS='+' # Define o separador do sistema"
+    echo
 	echo "        idades=(\"\`parameter-helper --out --sep + --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`\") # Array de tamanho 2 com os valores '20' e '40'"
+    echo
 	echo "        IFS=' ' # Volta ao separador padrão do sistema"
 	echo
 	echo "    Autor: Emanuel Moraes de Almeida"
