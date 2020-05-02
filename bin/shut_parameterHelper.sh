@@ -58,11 +58,11 @@ function _shut_parameterHelper_helpout {
     echo "    Exemplo 4: (Argumentos com string vazias são ignoradas nesta forma de uso)"
 	echo "        IFS=$'\n' # Define o separador do sistema"
     echo
-	echo "        idades=(\"\`parameter-helper --out --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`\") # Array de tamanho 2 com os valores '20' e '40'"
+	echo "        idades=(\`parameter-helper --out --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`) # Array de tamanho 2 com os valores '20' e '40'"
     echo
     echo "        IFS=$'+' # Define o separador do sistema"
     echo
-	echo "        nomes=(\"\`parameter-helper --out --sep + --index 1 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`\") # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'"
+	echo "        nomes=(\`parameter-helper --out --sep + --index 1 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`) # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'"
     echo
 	echo "        IFS=' ' # Volta ao separador padrão do sistema"
 	echo
