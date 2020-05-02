@@ -79,7 +79,7 @@ function _shut_parameterHelper_import {
             UTIL="shut_util"
         else
             >&2 echo "Erro! \"$DIRNAME/shut_util.sh\" não encontrado!"
-            exit 5
+            return 5
         fi
     fi
 
@@ -90,11 +90,11 @@ shut_parameterHelper_args=() # Array resposta do script
 shut_parameterHelper_exists=() # Array para informar se cada parâmetro de cada posição foi infomado (0 - não, 1 - sim)
 
 function _shut_parameterHelper_main {
-    _shut_parameterHelper_import # Importa utilitários
+    _shut_parameterHelper_import || return $? # Importa utilitários
 
     if [ "$1" = "--help" ]; then
-        _shut_parameterHelper_helpout # Executa função de ajuda na saída padrão
-        exit 0 # Finaliza Script com Sucesso!
+        _shut_parameterHelper_helpout || return $? # Executa função de ajuda na saída padrão
+        return 0 # Finaliza Script com Sucesso!
     fi
 
     local start_args=0 # Flag para indicar se o parâmetro @@ já foi lido
@@ -166,7 +166,7 @@ function _shut_parameterHelper_main {
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
             else
                 # >$2 echo "Erro! '--params' vazio!"
-                exit 1 # Finaliza Script com erro
+                return 1 # Finaliza Script com erro
             fi
 
         elif [ $start_args -eq 1 ]; then
@@ -176,7 +176,7 @@ function _shut_parameterHelper_main {
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                 # >$2 echo "Erro! '--params' vazio!"
-                exit 2 # Finaliza Script com erro
+                return 2 # Finaliza Script com erro
             fi
 
             len_params=${#params[@]}
@@ -194,7 +194,7 @@ function _shut_parameterHelper_main {
             done
         else
             # >$2 echo "Erro! Argumentos Inválidos!"
-            exit 3 # Finaliza Script com erro
+            return 3 # Finaliza Script com erro
         fi
     done
 

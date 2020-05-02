@@ -69,7 +69,7 @@ function _shut_gendesk_helperr {
 
 	>&2 _shut_gendesk_helpout # Executa função para exibir ajuda
 	>&2 printf "\n$message\n\n"
-	exit $err
+	return $err
 }
 
 function _shut_gendesk_getParameterHelper {
@@ -83,7 +83,7 @@ function _shut_gendesk_getParameterHelper {
 			PARAMETER_HELPER="parameter-helper"
 		else
 			>&2 echo "Erro! \"$DIRNAME/shut_parameterHelper.sh\" não encontrado!"
-			exit 100
+			return 100
 		fi
 	fi
 
@@ -121,7 +121,7 @@ function _shut_gendesk_main {
 
 	if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
 		_shut_gendesk_helpout autor
-		exit 0
+		return 0
 	fi
 
 	shut_util_array $'\n' "${shut_parameterHelper_args[1]}"
