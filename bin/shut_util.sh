@@ -29,26 +29,23 @@ function shut_util_join {
 #
 # shut_util_contains "$string" "${array[@]}"
 function shut_util_contains {
-    local target=""
-    local index=0
-    local flag=0
+    if [ $# -eq 0 ]; then
+        return 0
+    fi
 
+    local target="$1"
+    shift
+
+    local index=0
     for key in "$@"; do
-        if [ $index -eq 0 ]; then
-            target="$key"
-        elif [ "$key" = "$target" ]; then
-            flag=1
-            break
+        if [ "$key" = "$target" ]; then
+            return 0
         fi
 
         let index=$index+1
     done
 
-    if [ $flag -eq 0 ]; then
-        return 1
-    fi
-
-    return 0
+    return 1
 }
 
 # Cria um array de uma string por meio de um separador
