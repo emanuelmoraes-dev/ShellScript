@@ -2,32 +2,41 @@
 
 function _shut_parameterHelper_helpout {
 	echo
-	echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros nomeados e"
-	echo "    separar os valores de seus parâmetros. Se usado com o 'source', o resultado"
-    echo "    para cada parâmetro fica disponível na variável 'shut_parameterHelper_args'"
+	echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros"
+	echo "    nomeados e separar os valores de seus parâmetros. Se usado com"
+    echo "    o 'source', o resultado para cada parâmetro fica disponível na"
+    echo "    variável 'shut_parameterHelper_args'"
 	echo
 	echo "    Parâmetros:"
-	echo "        --index = Posição do parâmetro na qual será retornado seus valores. Valor padrão: 0"
-    echo "        --out = Exibe os valores do parâmetro da posição --index na saída padrão"
-    echo "        --exists = Lança erro se o parâmetro de --index não foi passado pelo usuário. Encerra"
-    echo "            a aplicação com sucesso caso o parâmetro foi passado. Opcional"
+	echo "        --index = Posição do parâmetro na qual será retornado seus"
+    echo "            valores. Valor padrão: 0"
+    echo "        --out = Exibe os valores do parâmetro da posição --index na"
+    echo "            saída padrão"
+    echo "        --exists = Lança erro se o parâmetro de --index não foi"
+    echo "            passado pelo usuário. Encerra a aplicação com sucesso"
+    echo "            caso o parâmetro foi passado. Opcional"
     echo "        --sep = Separador utilizado para separar os vários elementos"
-	echo "            de um array de valores passados pelo usuário. Valor padrão: \$'\n'"
-    echo "        --is-param = String na qual todos os parâmetros nomeados devem começar. Este"
-    echo "            parâmetro deve sempre vir antes do parâmetro --params. Valor padrão: -"
+	echo "            de uma lista de valores passados pelo usuário. Valor"
+    echo "            padrão: \$'\n'"
+    echo "        --is-param = String na qual todos os parâmetros nomeados devem"
+    echo "            começar. Este parâmetro deve sempre vir antes do parâmetro"
+    echo "            --params. Valor padrão: -"
 	echo "        --params = Nomes dos parâmetros esperados para o usuário passar"
-    echo "            (ignorando o valor de --is-param, que por padrão é '-'). Obrigatório"
-    echo "        --create-exists-array = Cria um array (shut_parameterHelper_exists)"
-    echo "            para informar se cada parâmetro de cada posição foi infomado pelo usuário"
-    echo "            (0 - não, 1 - sim)"
-    echo "        @@ = Informa que os argumentos começarão a ser analizados. Obrigatório"
+    echo "            (ignorando o valor de --is-param, que por padrão é '-')."
+    echo "            Obrigatório"
+    echo "        --create-exists-array = Cria um array"
+    echo "            (shut_parameterHelper_exists) para informar se cada parâmetro"
+    echo "            de cada posição foi infomado pelo usuário (0 - não, 1 - sim)"
+    echo "        @@ = Informa que os argumentos começarão a ser analizados."
+    echo "            Obrigatório"
 	echo
     echo "    Exemplo 1:"
     echo "        source parameter-helper --sep + --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro"
     echo
     echo "        shut_util_array + \"\${shut_parameterHelper_args[2]}\""
     echo
-    echo "        idades=(\"\${shut_util_return[@]}\") # Array de tamanho 3 com os valores '' '20' e '40'"
+    echo "        # Array de tamanho 3 com os valores '' '20' e '40'"
+    echo "        idades=(\"\${shut_util_return[@]}\")"
     echo
 	echo "    Exemplo 2:"
     echo "        # Se o parâmetro --v1 foi passado"
@@ -52,17 +61,20 @@ function _shut_parameterHelper_helpout {
     echo
     echo "            shut_util_array $'\n' \"\${shut_parameterHelper_args[1]}\""
     echo
-	echo "            nome=(\"\${shut_util_return[@]}\") # Array com 'Emanuel' e 'Pedro'"
+    echo "            # Array com 'Emanuel' e 'Pedro'"
+	echo "            nome=(\"\${shut_util_return[@]}\")"
     echo "        fi"
     echo
     echo "    Exemplo 4: (Argumentos com string vazias são ignoradas nesta forma de uso)"
 	echo "        IFS=$'\n' # Define o separador do sistema"
     echo
-	echo "        idades=(\`parameter-helper --out --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`) # Array de tamanho 2 com os valores '20' e '40'"
+    echo "        # Array de tamanho 2 com os valores '20' e '40'"
+	echo "        idades=(\`parameter-helper --out --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`)"
     echo
     echo "        IFS=$'+' # Define o separador do sistema"
     echo
-	echo "        nomes=(\`parameter-helper --out --sep + --index 1 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`) # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'"
+    echo "        # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'"
+	echo "        nomes=(\`parameter-helper --out --sep + --index 1 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro\`)"
     echo
 	echo "        IFS=' ' # Volta ao separador padrão do sistema"
 	echo

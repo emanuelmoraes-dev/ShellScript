@@ -10,15 +10,16 @@ function _shut_gendesk_helpout {
 	echo "    Parâmetros Nomeados:"
 	echo "        --help: Mostra todas as opções. Opcional"
 	echo "        --name: Nome da aplicação a ser exibido no menu. Obrigatório"
-	echo "        --exec: Comando de execução da aplicação. Obrigatório (é altamente recomendado"
-	echo "            que flags, como o %f, não sejam inseridos aqui. Caso alguma flag seja necessária, "
-	echo "            insira ela no parâmetro --flag-exec)"
+	echo "        --exec: Comando de execução da aplicação. Obrigatório (é altamente"
+	echo "            recomendado que flags, como o %f, não sejam inseridos aqui. "
+	echo "            Caso alguma flag seja necessária, insira ela no parâmetro"
+	echo "            --flag-exec)"
 	echo "        --icon: Caminho onde se encontra o ícone da aplicação. Opcional"
 	echo "        --categories: Lista de categorias separadas por espaço. Opcional"
 	echo "        --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o"
 	echo "            mesmo valor presente no parâmetro --name"
-	echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave 'Exec'"
-	echo "            do [Desktop Entry]. Opcional"
+	echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave"
+	echo "            'Exec' do [Desktop Entry]. Opcional"
 	echo "        --comment: Comentário sobre a aplicação. Opcional"
 	echo
 	echo "    Parâmetros Posicionais:"
@@ -38,10 +39,10 @@ function _shut_gendesk_helpout {
 	echo
 	echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse \"\" \"IDE para desenvolvedores Java\""
 	echo
-	echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste caso"
-	echo "    os parâmetros nomeados sempre terão preferência, sobrescrevendo os posicionais."
-	echo "    Os parâmetros posicionais não sobrescrevem eles próprios, acumulando os valores"
-	echo "    caso eles seja duplicados"
+	echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste"
+	echo "    caso os parâmetros nomeados sempre terão preferência, sobrescrevendo os"
+	echo "    posicionais. Os parâmetros posicionais não sobrescrevem eles próprios,"
+	echo "    acumulando os valores caso eles seja duplicados"
 	echo
 	
 	if [ "$1" = "autor" ]; then
