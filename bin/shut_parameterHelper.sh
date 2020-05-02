@@ -160,13 +160,15 @@ function _shut_parameterHelper_main {
 
         elif [ $start_args -eq 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
 
+            shut_util_contains || return 1
+
             if shut_util_contains "$a" "${params[@]}"; then
                 param="$a" # 'param' recebe o argumento
                 len_used_params=${#used_params[@]} # Tamanho do array "used_params"
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
             else
                 # >$2 echo "Erro! '--params' vazio!"
-                return 1 # Finaliza Script com erro
+                return 2 # Finaliza Script com erro
             fi
 
         elif [ $start_args -eq 1 ]; then
@@ -176,7 +178,7 @@ function _shut_parameterHelper_main {
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                 # >$2 echo "Erro! '--params' vazio!"
-                return 2 # Finaliza Script com erro
+                return 3 # Finaliza Script com erro
             fi
 
             len_params=${#params[@]}
@@ -194,14 +196,16 @@ function _shut_parameterHelper_main {
             done
         else
             # >$2 echo "Erro! Argumentos Inválidos!"
-            return 3 # Finaliza Script com erro
+            return 4 # Finaliza Script com erro
         fi
     done
 
     if [ $present_exists -eq 1 ]; then
+        shut_util_contains || return 1
         shut_util_contains "${params[index]}" "${used_params[@]}"
     else
         if [ $present_create_exists_array -eq 1 ]; then
+            shut_util_contains || return 1
             for (( i=0; i < len_params; i++ )); do
                 if shut_util_contains "${params[i]}" "${used_params[@]}"; then
                     shut_parameterHelper_exists[$i]=1

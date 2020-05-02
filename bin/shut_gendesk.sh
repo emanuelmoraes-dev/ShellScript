@@ -111,7 +111,7 @@ function _shut_gendesk_adapter {
 }
 
 function _shut_gendesk_main {
-	local PARAMETER_HELPER="`_shut_gendesk_getParameterHelper`"
+	local PARAMETER_HELPER="`_shut_gendesk_getParameterHelper`" || return $?
 
 	if [ $# -eq 0 ]; then
 		_shut_gendesk_helperr "Erro! Argumentos vazios" 101
@@ -120,38 +120,38 @@ function _shut_gendesk_main {
 	source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@" || _shut_gendesk_helperr
 
 	if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
-		_shut_gendesk_helpout autor
+		_shut_gendesk_helpout autor || return $?
 		return 0
 	fi
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[1]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[1]}" || return $?
 	args_default=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[2]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[2]}" || return $?
 	args_name=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[3]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[3]}" || return $?
 	args_exec=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[4]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[4]}" || return $?
 	args_icon=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[5]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[5]}" || return $?
 	args_categories=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[6]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[6]}" || return $?
 	args_filename=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[7]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[7]}" || return $?
 	args_flag_exec=("${shut_util_return[@]}")
 
-	shut_util_array $'\n' "${shut_parameterHelper_args[8]}"
+	shut_util_array $'\n' "${shut_parameterHelper_args[8]}" || return $?
 	args_comment=("${shut_util_return[@]}")
 
 	Name="${args_default[0]}"
 	Exec="${args_default[1]}"
 	Icon="${args_default[2]}"
-	Categories="`shut_util_join \; ${args_default[3]}`"
+	Categories="`shut_util_join \; ${args_default[3]}`" || return $?
 	Filename="${args_default[4]}"
 	FlagExec="${args_default[5]}"
 	Comment="${args_default[6]}"
@@ -169,7 +169,7 @@ function _shut_gendesk_main {
 	fi
 
 	if [ ${shut_parameterHelper_exists[5]} -eq 1 ]; then
-		Categories="`shut_util_join \; ${args_categories[@]}`"
+		Categories="`shut_util_join \; ${args_categories[@]}`" || return $?
 	fi
 
 	if [ ${shut_parameterHelper_exists[6]} -eq 1 ]; then
@@ -196,8 +196,8 @@ function _shut_gendesk_main {
 		Filename="$Name"
 	fi
 
-	Exec="`_shut_gendesk_adapter "$Exec"`"
-	Icon="`_shut_gendesk_adapter "$Icon"`"
+	Exec="`_shut_gendesk_adapter "$Exec"`" || return $?
+	Icon="`_shut_gendesk_adapter "$Icon"`" || return $?
 
 	if [ "$(id -u)" = "0" ]; then
 		echo "\
