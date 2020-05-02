@@ -102,6 +102,7 @@ function _shut_parameterHelper_main {
     local present_create_exists_array=0 # Flag para indicar se o parâmetro "--create-exists-array" está presente
     local present_out=0 # Flag para indicar se o parâmetro "--out" está presente
     local param="" # Parâmetro atual na qual está sendo extraído seus valores
+    local empty_param=1 # Informa se o parâmetro atual ainda não possui valores
     local index="0" # Posição do parâmetro que terá seus valores retornados
     local sep=$'\n' # Separador utilizado para separar os vários elementos de um array de valores passados pelo usuário
     local is_param="-" # String na qual todos os parâmetros nomeados devem começar
@@ -166,8 +167,9 @@ function _shut_parameterHelper_main {
                 param="$a" # 'param' recebe o argumento
                 len_used_params=${#used_params[@]} # Tamanho do array "used_params"
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
+                empty_param=1 # Informa que o parâmetro atual ainda não possui valores
             else
-                # >$2 echo "Erro! '--params' vazio!"
+                # >$2 echo "Erro! Parâmetro não encontrado!"
                 return 2 # Finaliza Script com erro
             fi
 
@@ -185,8 +187,9 @@ function _shut_parameterHelper_main {
             for ((i=0 ; i < len_params ; i++)); do # Percorre a lista de parâmetros
                 local_param="${params[i]}"
                 if [ "$param" = "$local_param" ]; then # Se o 'param' foi encontrado na lista de parâmetros
-                    if [ -z "${shut_parameterHelper_args[$i]}" ]; then
+                    if [ $empty_param -eq 1 ]; then
                         shut_parameterHelper_args[$i]="$a" # Um novo valor para o parâmetro de posição 'i'
+                        empty_param=0
                     else
                         shut_parameterHelper_args[$i]="${shut_parameterHelper_args[$i]}${sep}${a}" # Um novo valor para o parâmetro de posição 'i'
                     fi
