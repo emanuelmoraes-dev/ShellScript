@@ -91,8 +91,6 @@ function _shut_parameterHelper_import {
     if ! [ -f "$UTIL" ]; then
         if type -P "shut_util" 1> /dev/null 2> /dev/null; then
             UTIL="shut_util"
-        elif type -P "shut_util" 1> /dev/null 2> /dev/null; then
-            UTIL="shut_util"
         elif type -P "shut-util" 1> /dev/null 2> /dev/null; then
             UTIL="shut-util"
         else
