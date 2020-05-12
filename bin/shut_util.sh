@@ -13,17 +13,7 @@
 #
 # shut_util_join --help # show help
 function shut_util_join {
-    if [ "$1" = "--help" ]; then
-        echo    Exibe na saída padrão uma string de um array unido por meio
-        echo    de um separador
-        echo
-        echo    shut_util_join \"\<sep\>\" \"\${\<array\>[@]}\"
-        echo
-        echo    shut_util_join --help \# show help
-        echo
-    fi
-
-	local sep="$1"
+    local sep="$1"
 	shift
 	local rt="$1"
 	shift
@@ -43,18 +33,6 @@ function shut_util_join {
 #
 # shut_util_contains --help # show help
 function shut_util_contains {
-    if [ "$1" = "--help" ]; then
-        echo    Verifica se uma string está dentro de um array. Se a string
-        echo    estiver no array, finaliza-se a função corretamente. Caso
-        echo    contrário, a função é encerrada com erro
-        echo
-        echo    shut_util_contains \"\<string\>\" \"\${\<array\>[@]}\"
-        echo
-        echo    shut_util_contains --help \# show help
-        echo
-        return
-    fi
-
     if [ $# -eq 0 ]; then
         return 0
     fi
@@ -81,18 +59,6 @@ function shut_util_contains {
 #
 # shut_util_array --help # show help
 function shut_util_array {
-
-    if [ "$#" = "0" ] || [ "$1" = "--help" ]; then
-        echo    Cria um array de uma string por meio de um separador
-        echo
-        echo    shut_util_array \"\<variable_name\>\" \"\<separador\>\" \<string\>
-        echo    array=\(\"\${shut_util_return[@]}\"\) \# array
-        echo
-        echo    shut_util_array --help \# show help
-        echo
-        return
-    fi
-
     local sep="$1"
     local len_sep=${#sep}
     local i_last_sep
