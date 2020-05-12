@@ -102,7 +102,7 @@ function _shut_gendesk_adapter {
 		fi
 	fi
 
-	if ! type -P "$rt" 1> /dev/null 2> /dev/null; then
+	if [ "$2" = "--is-exec" ] && ! type -P "$rt" 1> /dev/null 2> /dev/null; then
 		rt="$1"
 	elif [ -f "$rt" ]; then
 		rt="${rt// /\\ }"
@@ -197,7 +197,7 @@ function _shut_gendesk_main {
 		Filename="$Name"
 	fi
 
-	Exec="`_shut_gendesk_adapter "$Exec"`" || return $?
+	Exec="`_shut_gendesk_adapter "$Exec" --is-exec`" || return $?
 	Icon="`_shut_gendesk_adapter "$Icon"`" || return $?
 
 	if [ "$(id -u)" = "0" ]; then
