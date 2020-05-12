@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
+PARAMETER_HELPER_NAME="parameter-helper"
+
 function _shut_gendesk_helpout {
 	echo
 	echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
@@ -78,10 +81,10 @@ function _shut_gendesk_getParameterHelper {
 	local PARAMETER_HELPER="$DIRNAME/shut_parameterHelper"
 
 	if ! [ -f "$PARAMETER_HELPER" ]; then
-		if type -P "parameter-helper" 1> /dev/null 2> /dev/null; then
-			PARAMETER_HELPER="parameter-helper"
+		if type -P "$PARAMETER_HELPER_NAME" 1> /dev/null 2> /dev/null; then
+			PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
 		else
-			>&2 echo "Erro! \"parameter-helper\" não encontrado!"
+			>&2 echo "Erro! \"$PARAMETER_HELPER_NAME\" não encontrado!"
 			return 100
 		fi
 	fi

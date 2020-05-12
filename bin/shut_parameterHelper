@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
+SHUT_UTIL_NAME="shut-util"
+
 function _shut_parameterHelper_helpout {
 	echo
 	echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros"
@@ -89,10 +92,10 @@ function _shut_parameterHelper_import {
     local UTIL="$DIRNAME/shut_util"
 
     if ! [ -f "$UTIL" ]; then
-        if type -P "shut-util" 1> /dev/null 2> /dev/null; then
-            UTIL="shut-util"
+        if type -P "$SHUT_UTIL_NAME" 1> /dev/null 2> /dev/null; then
+            UTIL="$SHUT_UTIL_NAME"
         else
-            >&2 echo "Erro! \"shut-util\" não encontrado!"
+            >&2 echo "Erro! \"$SHUT_UTIL_NAME\" não encontrado!"
             return 5
         fi
     fi
