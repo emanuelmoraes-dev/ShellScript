@@ -90,7 +90,7 @@ function _shut_parameterHelper_helpout() {
 
 function _shut_parameterHelper_import() {
     local DIRNAME="$(dirname "$0")"
-    local UTIL="$DIRNAME/shut_util"
+    local UTIL="$DIRNAME/shut_util.sh"
 
     if ! [ -f "$UTIL" ]; then
         if type -P "$SHUT_UTIL_NAME" 1>/dev/null 2>/dev/null; then

@@ -64,7 +64,6 @@ echo \
     "[Unit]
 Description=Atribuição de Permissão de Escrita e Leitura para arquivo $folder/brightness
 ConditionPathExists=/etc/zbrigthness_rc
-
 [Service]
 Type=forking
 ExecStart=/etc/zbrigthness_rc start
@@ -72,7 +71,6 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
-
 [Install]
 WantedBy=multi-user.target" >/etc/systemd/system/zbrightness_permissions
 
@@ -95,7 +93,6 @@ echo "folder=$folder" >>/bin/zbrightness
 
 echo 'value=$(cat $folder/brightness)
 value_max=$(cat $folder/max_brightness)
-
 if [ $(echo $LANG | cut -b1-2) = "pt" ]
 then
     title_text="Controle de brilho"
@@ -104,11 +101,9 @@ else
     title_text="Brightness control"
     scale_text="Intensity adjustment (75 to $value_max)"
 fi
-
 new_value=$(zenity --scale --title "$title_text" --text \
 "$scale_text" --min-value 75 --max-value $value_max --value \
 $value --step 1)
-
 echo -n $new_value > $folder/brightness' >>/bin/zbrightness
 
 chmod +x /bin/zbrightness
@@ -1925,7 +1920,6 @@ echo "
     Para que o atalho do teclado de DIMINUIR o brilho funcione,
     adicione nas configurações de seu computador um atalho de teclado
     com o seguinte comando:
-
     /bin/bash -c 'v=\$(cat $folder/brightness); let v=\$v-300; if [ \$v -lt 75 ]; then v=75; fi; echo -n \$v > $folder/brightness'"
 
 read a
@@ -1934,7 +1928,6 @@ echo "
     Para que o atalho do teclado de AUMENTAR o brilho funcione,
     adicione nas configurações de seu computador um atalho de teclado
     com o seguinte comando:
-
     /bin/bash -c 'v=\$(cat $folder/brightness); value_max=$(cat $folder/max_brightness); let v=\$v+300; if [ \$v -gt \$value_max ]; then v=\$value_max; fi; echo -n \$v > $folder/brightness'"
 
 read a
