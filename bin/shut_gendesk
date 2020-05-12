@@ -8,7 +8,8 @@ function _shut_gendesk_helpout() {
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
     echo "    qualquer no menu do sistema. Se o usuário for root, cria-se um arquivo"
     echo "    \".desktop\" em /usr/share/applications. Caso contrário, cria-se o arquivo"
-    echo "    em $HOME/.local/share/applications"
+    echo "    em $HOME/.local/share/applications. Os parâmetros que iniciam por -- possuem"
+    echo "    maior prioridade"
     echo
     echo "    Parâmetros Nomeados:"
     echo "        --help: Mostra todas as opções. Opcional"
@@ -25,6 +26,15 @@ function _shut_gendesk_helpout() {
     echo "            'Exec' do [Desktop Entry]. Opcional"
     echo "        --comment: Comentário sobre a aplicação. Opcional"
     echo
+    echo "    Atalhos:"
+    echo "        -n = --name"
+    echo "        -e = --exec"
+    echo "        -i = --icon"
+    echo "        -c = --categories"
+    echo "        -f = --filename"
+    echo "        -fe = --flag-exec"
+    echo "        -ct = --comment"
+    echo
     echo "    Parâmetros Posicionais:"
     echo "        0: Equivalente ao parâmetro nomeado --name"
     echo "        1: Equivalente ao parâmetro nomeado --exec"
@@ -37,6 +47,8 @@ function _shut_gendesk_helpout() {
     echo "    Exemplos de Uso:"
     echo
     echo "        gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm --categories Development Java --filename eclipse --flag-exec %f --comment IDE para desenvolvedores Java"
+    echo
+    echo "        gendesk -n Eclipse -e ./eclipse/eclipse -i ./eclipse/icon.xpm -c Development Java -f eclipse -fe %f -ct IDE para desenvolvedores Java"
     echo
     echo "        gendesk Eclipse ./eclipse/eclipse ./eclipse/icon.xpm \"Development Java\" eclipse %f \"IDE para desenvolvedores Java\""
     echo
@@ -57,14 +69,6 @@ function _shut_gendesk_helpout() {
 }
 
 function _shut_gendesk_helperr() {
-    local err=$?
-
-    if [ "$2" ]; then
-        err="$2"
-    elif [ -z "$err" ]; then
-        err=200
-    fi
-
     local message="$1"
 
     if [ -z "$message" ]; then
@@ -73,7 +77,6 @@ function _shut_gendesk_helperr() {
 
     _shut_gendesk_helpout >&2 # Executa função para exibir ajuda
     printf >&2 "\n$message\n\n"
-    return $err
 }
 
 function _shut_gendesk_getParameterHelper() {
@@ -116,15 +119,41 @@ function _shut_gendesk_main() {
     local PARAMETER_HELPER="$(_shut_gendesk_getParameterHelper)" || return $?
 
     if [ $# -eq 0 ]; then
-        _shut_gendesk_helperr "Erro! Argumentos vazios" 101
+        _shut_gendesk_helperr "Erro! Argumentos vazios"
+        return 101
     fi
 
-    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment @@ --default "$@" || _shut_gendesk_helperr
+    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment n e i c f fe ct @@ --default "$@" || (err="$?"; _shut_gendesk_helperr; return $err )
 
     if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
         _shut_gendesk_helpout autor || return $?
         return 0
     fi
+
+    # Arrays dos parâmetros de atalho
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[9]}" || return $?
+    args_shortcut_name=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[10]}" || return $?
+    args_shortcut_exec=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[11]}" || return $?
+    args_shortcut_icon=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[12]}" || return $?
+    args_shortcut_categories=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
+    args_shortcut_filename=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
+    args_shortcut_flag_exec=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
+    args_shortcut_comment=("${shut_util_return[@]}")
+
+    # Arrays dos parâmetros nomeados
 
     shut_util_array $'\n' "${shut_parameterHelper_args[1]}" || return $?
     args_default=("${shut_util_return[@]}")
@@ -158,6 +187,38 @@ function _shut_gendesk_main() {
     FlagExec="${args_default[5]}"
     Comment="${args_default[6]}"
 
+    # Parâmetros de atalho
+
+    if [ ${shut_parameterHelper_exists[9]} -eq 1 ]; then
+        Name="${args_shortcut_name[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[10]} -eq 1 ]; then
+        Exec="${args_shortcut_exec[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[11]} -eq 1 ]; then
+        Icon="${args_shortcut_icon[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[12]} -eq 1 ]; then
+        Categories="$(shut_util_join \; ${args_shortcut_categories[@]})" || return $?
+    fi
+
+    if [ ${shut_parameterHelper_exists[13]} -eq 1 ]; then
+        Filename="${args_shortcut_filename[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[14]} -eq 1 ]; then
+        FlagExec="${args_shortcut_flag_exec[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[15]} -eq 1 ]; then
+        Comment="${args_shortcut_comment[@]}"
+    fi
+
+    # Parâmetros nomeados
+
     if [ ${shut_parameterHelper_exists[2]} -eq 1 ]; then
         Name="${args_name[@]}"
     fi
@@ -187,11 +248,13 @@ function _shut_gendesk_main() {
     fi
 
     if [ -z "$Name" ]; then
-        _shut_gendesk_helperr "Erro! --name não informado!" 102
+        _shut_gendesk_helperr "Erro! --name não informado!"
+        return 102
     fi
 
     if [ -z "$Exec" ]; then
-        _shut_gendesk_helperr "Erro! --exec não informado!" 103
+        _shut_gendesk_helperr "Erro! --exec não informado!"
+        return 103
     fi
 
     if [ -z "$Filename" ]; then
