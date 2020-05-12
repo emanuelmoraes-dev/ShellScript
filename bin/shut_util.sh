@@ -9,8 +9,20 @@
 # Exibe na saída padrão uma string de um array unido por meio
 # de um separador
 #
-# shut_util_join "$sep" "${array[@]}"
+# shut_util_join "<sep>" "${<array>[@]}"
+#
+# shut_util_join --help # show help
 function shut_util_join {
+    if [ "$1" = "--help" ]; then
+        echo    Exibe na saída padrão uma string de um array unido por meio
+        echo    de um separador
+        echo
+        echo    shut_util_join \"\<sep\>\" \"\${\<array\>[@]}\"
+        echo
+        echo    shut_util_join --help \# show help
+        echo
+    fi
+
 	local sep="$1"
 	shift
 	local rt="$1"
@@ -27,8 +39,22 @@ function shut_util_join {
 # estiver no array, finaliza-se a função corretamente. Caso
 # contrário, a função é encerrada com erro
 #
-# shut_util_contains "$string" "${array[@]}"
+# shut_util_contains "<string>" "${<array>[@]}"
+#
+# shut_util_contains --help # show help
 function shut_util_contains {
+    if [ "$1" = "--help" ]; then
+        echo    Verifica se uma string está dentro de um array. Se a string
+        echo    estiver no array, finaliza-se a função corretamente. Caso
+        echo    contrário, a função é encerrada com erro
+        echo
+        echo    shut_util_contains \"\<string\>\" \"\${\<array\>[@]}\"
+        echo
+        echo    shut_util_contains --help \# show help
+        echo
+        return
+    fi
+
     if [ $# -eq 0 ]; then
         return 0
     fi
@@ -50,30 +76,54 @@ function shut_util_contains {
 
 # Cria um array de uma string por meio de um separador
 #
-# shut_util_array "$separador" "$string"
-# array=("${shut_util_return[@]}")
+# shut_util_array "<separador>" <string>
+# array=("${shut_util_return[@]}") # array
+#
+# shut_util_array --help # show help
 function shut_util_array {
-    local sep=$1
+
+    if [ "$#" = "0" ] || [ "$1" = "--help" ]; then
+        echo    Cria um array de uma string por meio de um separador
+        echo
+        echo    shut_util_array \"\<variable_name\>\" \"\<separador\>\" \<string\>
+        echo    array=\(\"\${shut_util_return[@]}\"\) \# array
+        echo
+        echo    shut_util_array --help \# show help
+        echo
+        return
+    fi
+
+    local sep="$1"
+    local len_sep=${#sep}
+    local i_last_sep
+    let i_last_sep=$len_sep-1
     shift
 
     local args="$@"
-    local len=${#args}
-    local j=0
-    local ch
-    shut_util_return=()
+    local len_args=${#args}
 
-    if [ "$len" != "0" ]; then
+    shut_util_return=()
+    local i_return=0
+
+    if [ "$len_args" != "0" ]; then
         shut_util_return[0]=""
     fi
 
-    for (( i=0; i < len; i++ )); do
-        ch=${args:i:1}
+    local ch
+    local sub
+    for (( i=0; i < len_args; i++ )); do
+        ch="${args:i:1}"
+        sub="${args:i:len_sep}"
 
-        if [ "$ch" = "$sep" ]; then
-            let j=$j+1
-            shut_util_return[$j]=""
+        if [ -z "$sep" ]; then
+            shut_util_return[$i_return]="${ch}"
+            let i_return=$i_return+1
+        elif [ "$sub" = "$sep" ]; then
+            let i_return=$i_return+1
+            shut_util_return[$i_return]=""
+            let i=$i+$i_last_sep
         else
-            shut_util_return[$j]="${shut_util_return[j]}${ch}"
+            shut_util_return[$i_return]="${shut_util_return[i_return]}${ch}"
         fi
     done
 }
