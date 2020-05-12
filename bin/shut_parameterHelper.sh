@@ -89,9 +89,9 @@ function _shut_parameterHelper_import {
     local UTIL="$DIRNAME/shut_util.sh"
 
     if ! [ -f "$UTIL" ]; then
-        if which "shut_util.sh" 1> /dev/null 2> /dev/null; then
+        if type -P "shut_util.sh" 1> /dev/null 2> /dev/null; then
             UTIL="shut_util.sh"
-        elif which "shut_util" 1> /dev/null 2> /dev/null; then
+        elif type -P "shut_util" 1> /dev/null 2> /dev/null; then
             UTIL="shut_util"
         else
             >&2 echo "Erro! \"$DIRNAME/shut_util.sh\" não encontrado!"
