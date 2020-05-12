@@ -30,6 +30,7 @@ function _shut_parameterHelper_helpout() {
     echo "        --create-exists-array = Cria um array"
     echo "            (shut_parameterHelper_exists) para informar se cada parâmetro"
     echo "            de cada posição foi infomado pelo usuário (0 - não, 1 - sim)"
+    echo "        --no-strict = Impede o lançamento de erro por parâmetro desconhecido"
     echo "        @@ = Informa que os argumentos começarão a ser analizados."
     echo "            Obrigatório"
     echo
@@ -118,6 +119,7 @@ function _shut_parameterHelper_main() {
     local present_exists=0              # Flag para indicar se o parâmetro "--exists" está presente
     local present_create_exists_array=0 # Flag para indicar se o parâmetro "--create-exists-array" está presente
     local present_out=0                 # Flag para indicar se o parâmetro "--out" está presente
+    local present_no_strict=0           # Flag para indicar se o parâmetro "--no-strict" está presente
     local param=""                      # Parâmetro atual na qual está sendo extraído seus valores
     local empty_param=1                 # Informa se o parâmetro atual ainda não possui valores
     local index="0"                     # Posição do parâmetro que terá seus valores retornados
@@ -136,6 +138,7 @@ function _shut_parameterHelper_main() {
                 [ "$a" = "--exists" ] ||
                 [ "$a" = "--create-exists-array" ] ||
                 [ "$a" = "--out" ] ||
+                [ "$a" = "--no-strict" ] ||
                 [ "$a" = "--is-param" ] ||
                 [ "$a" = "@@" ]
         ); then
@@ -152,6 +155,8 @@ function _shut_parameterHelper_main() {
                 present_create_exists_array=1
             elif [ "$a" = "--out" ]; then
                 present_out=1
+            elif [ "$a" = "--no-strict" ]; then
+                present_no_strict=1
             elif [ "$a" = "--is-param" ]; then
                 is_param="-"
             elif [ "$a" = "@@" ]; then
@@ -185,7 +190,7 @@ function _shut_parameterHelper_main() {
                 len_used_params=${#used_params[@]}     # Tamanho do array "used_params"
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
-            else
+            elif [ "$present_no_strict" = "0" ]
                 echo >$2 "Erro! Parâmetro $a inválido!"
                 return 2 # Finaliza Script com erro
             fi
