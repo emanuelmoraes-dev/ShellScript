@@ -78,12 +78,10 @@ function _shut_gendesk_getParameterHelper {
 	local PARAMETER_HELPER="$DIRNAME/shut_parameterHelper"
 
 	if ! [ -f "$PARAMETER_HELPER" ]; then
-		if type -P "shut_parameterHelper" 1> /dev/null 2> /dev/null; then
-			PARAMETER_HELPER="shut_parameterHelper" 
-		elif type -P "parameter-helper" 1> /dev/null 2> /dev/null; then
+		if type -P "parameter-helper" 1> /dev/null 2> /dev/null; then
 			PARAMETER_HELPER="parameter-helper"
 		else
-			>&2 echo "Erro! \"$DIRNAME/shut_parameterHelper\" não encontrado!"
+			>&2 echo "Erro! \"parameter-helper\" não encontrado!"
 			return 100
 		fi
 	fi
