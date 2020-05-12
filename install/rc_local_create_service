@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function helpout {
+function helpout() {
     echo "    Script que cria e define o serviço de executar um arquivo com permissões"
     echo "    administrativas ao iniciar o computador"
     echo
@@ -41,7 +41,7 @@ if [ -z "$file" ]; then
 fi
 
 echo \
-"[Unit]
+    "[Unit]
 Description=$file Config
 ConditionPathExists=$file
 
@@ -54,11 +54,11 @@ RemainAfterExit=yes
 SysVStartPriority=99
 
 [Install]
-WantedBy=multi-user.target" > /etc/systemd/system/rc-exec-local.service
+WantedBy=multi-user.target" >/etc/systemd/system/rc-exec-local.service
 
 echo \
-"#!/bin/sh
-echo  deadline > /sys/block/sda/queue/scheduler" > $file
+    "#!/bin/sh
+echo  deadline > /sys/block/sda/queue/scheduler" >$file
 
 chmod +x $file
 
@@ -77,4 +77,3 @@ echo "Para parar o serviço, dê os seguintes comandos"
 echo
 echo "systemctl stop rc-exec-local.service"
 echo "systemctl disable rc-exec-local.service"
-

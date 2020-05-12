@@ -12,17 +12,17 @@
 # shut_util_join "<sep>" "${<array>[@]}"
 #
 # shut_util_join --help # show help
-function shut_util_join {
+function shut_util_join() {
     local sep="$1"
-	shift
-	local rt="$1"
-	shift
+    shift
+    local rt="$1"
+    shift
 
-	for v in "$@"; do
-		rt="${rt}${sep}${v}"
-	done
+    for v in "$@"; do
+        rt="${rt}${sep}${v}"
+    done
 
-	printf "$rt\n"
+    printf "$rt\n"
 }
 
 # Verifica se uma string está dentro de um array. Se a string
@@ -32,7 +32,7 @@ function shut_util_join {
 # shut_util_contains "<string>" "${<array>[@]}"
 #
 # shut_util_contains --help # show help
-function shut_util_contains {
+function shut_util_contains() {
     if [ $# -eq 0 ]; then
         return 0
     fi
@@ -58,7 +58,7 @@ function shut_util_contains {
 # array=("${shut_util_return[@]}") # array
 #
 # shut_util_array --help # show help
-function shut_util_array {
+function shut_util_array() {
     local sep="$1"
     local len_sep=${#sep}
     local i_last_sep
@@ -77,7 +77,7 @@ function shut_util_array {
 
     local ch
     local sub
-    for (( i=0; i < len_args; i++ )); do
+    for ((i = 0; i < len_args; i++)); do
         ch="${args:i:1}"
         sub="${args:i:len_sep}"
 

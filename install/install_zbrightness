@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function helpout {
+function helpout() {
     echo "    Script que instala um utilitario para alterar o brilho da tela"
     echo "    Requer Zenity instalado"
     echo
@@ -23,7 +23,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-if ! type -P zenity 1> /dev/null 2> /dev/null; then
+if ! type -P zenity 1>/dev/null 2>/dev/null; then
     echo '  Erro: dependência "zenity" não encontrada!'
     echo '  Por favor instale a dependência "zenity"'
     exit 2
@@ -51,17 +51,17 @@ length=${#folderArray[@]}
 let length=length-1
 folder=""
 
-for ((i = 0 ; i < length ; i++)); do
+for ((i = 0; i < length; i++)); do
     folder="$folder/${folderArray[i]}"
 done
 
 echo "$> Gerando Serviço zbrightness_permissions.service ..."
 
-echo "chmod 666 $folder/brightness" > /etc/zbrigthness_rc
+echo "chmod 666 $folder/brightness" >/etc/zbrigthness_rc
 chmod 700 /etc/zbrigthness_rc
 
 echo \
-"[Unit]
+    "[Unit]
 Description=Atribuição de Permissão de Escrita e Leitura para arquivo $folder/brightness
 ConditionPathExists=/etc/zbrigthness_rc
 
@@ -74,18 +74,24 @@ RemainAfterExit=yes
 SysVStartPriority=99
 
 [Install]
-WantedBy=multi-user.target" > /etc/systemd/system/zbrightness_permissions
+WantedBy=multi-user.target" >/etc/systemd/system/zbrightness_permissions
 
 echo "$> inicializando Serviço zbrightness_permissions.service ..."
 
-sudo systemctl enable zbrightness_permissions || (echo "Error: Não foi possível habilitar o serviço 'zbrightness_permissions'" ; exit 200)
-sudo systemctl start zbrightness_permissions || (echo "Error: Não foi possível inicializar o serviço 'zbrightness_permissions'" ; exit 201)
+sudo systemctl enable zbrightness_permissions || (
+    echo "Error: Não foi possível habilitar o serviço 'zbrightness_permissions'"
+    exit 200
+)
+sudo systemctl start zbrightness_permissions || (
+    echo "Error: Não foi possível inicializar o serviço 'zbrightness_permissions'"
+    exit 201
+)
 
 echo "$> Extraindo zbrightness ..."
 
-echo '#!/bin/bash' > /bin/zbrightness
-echo '' >> /bin/zbrightness
-echo "folder=$folder" >> /bin/zbrightness
+echo '#!/bin/bash' >/bin/zbrightness
+echo '' >>/bin/zbrightness
+echo "folder=$folder" >>/bin/zbrightness
 
 echo 'value=$(cat $folder/brightness)
 value_max=$(cat $folder/max_brightness)
@@ -103,7 +109,7 @@ new_value=$(zenity --scale --title "$title_text" --text \
 "$scale_text" --min-value 75 --max-value $value_max --value \
 $value --step 1)
 
-echo -n $new_value > $folder/brightness' >> /bin/zbrightness
+echo -n $new_value > $folder/brightness' >>/bin/zbrightness
 
 chmod +x /bin/zbrightness
 
@@ -115,7 +121,7 @@ Categories=Settings;
 Exec=/bin/zbrightness
 Icon=/usr/share/icons/zbrightness_icon.png
 Terminal=false
-Type=Application' > /usr/share/applications/zbrightness.desktop
+Type=Application' >/usr/share/applications/zbrightness.desktop
 
 echo "$> Extraindo Ícone ..."
 
@@ -1908,18 +1914,16 @@ if ! echo " 89 50 4e 47 0d 0a 1a 0a 00 00 00 0d 49 48 44 52
  a1 50 28 14 0a 85 42 a1 50 28 94 f9 c3 ff 07 a7
  5c 96 97 4d 72 f9 08 00 00 00 00 49 45 4e 44 ae
  42 60 82
-" | LC_ALL=C tr -cd 0-9a-fA-F | xxd -r -p > /usr/share/icons/zbrightness_icon.png
-then
-    echo "    Não foi possível gerar o ícone da aplicação" 
-else 
+" | LC_ALL=C tr -cd 0-9a-fA-F | xxd -r -p >/usr/share/icons/zbrightness_icon.png; then
+    echo "    Não foi possível gerar o ícone da aplicação"
+else
     echo ""
-    echo "    Ícone da aplicação gerado" 
+    echo "    Ícone da aplicação gerado"
 fi
-
 
 echo "
     Para que o atalho do teclado de DIMINUIR o brilho funcione,
-    adicione nas configurações de seu computador um atalho de teclado 
+    adicione nas configurações de seu computador um atalho de teclado
     com o seguinte comando:
 
     /bin/bash -c 'v=\$(cat $folder/brightness); let v=\$v-300; if [ \$v -lt 75 ]; then v=75; fi; echo -n \$v > $folder/brightness'"
@@ -1928,7 +1932,7 @@ read a
 
 echo "
     Para que o atalho do teclado de AUMENTAR o brilho funcione,
-    adicione nas configurações de seu computador um atalho de teclado 
+    adicione nas configurações de seu computador um atalho de teclado
     com o seguinte comando:
 
     /bin/bash -c 'v=\$(cat $folder/brightness); value_max=$(cat $folder/max_brightness); let v=\$v+300; if [ \$v -gt \$value_max ]; then v=\$value_max; fi; echo -n \$v > $folder/brightness'"
