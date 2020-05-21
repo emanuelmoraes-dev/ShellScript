@@ -12,7 +12,14 @@ ERR_EMPTY_ARGUMENTS=71
 ERR_EMPTY_NAME_ARG=72
 ERR_EMPTY_EXEC_ARG=73
 
-function _shut_gendesk_helpout() {
+# CORES
+RED="\e[31;1m"
+END_COLOR="\e[m"
+
+# TEMAS
+ERROR_THEME="$RED"
+
+function helpout() {
     echo
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
     echo "    qualquer no menu do sistema. Caso contrário, cria-se o arquivo em"
@@ -84,10 +91,15 @@ function _shut_gendesk_helpout() {
     fi
 }
 
+function logerr() {
+    local message="$@"
+    printf >&2 "${ERROR_THEME}\n  ${message}${END_COLOR}\n"
+}
+
 # Ecoa mensagem de erro em erro padrão e código do erro em saída padrão
 #
-#EX: m="Erro interno! Algo inesperado ocorreu" e=100 _shut_gendesk_helperr -v
-function _shut_gendesk_helperr() {
+#EX: m="Erro interno! Algo inesperado ocorreu" e=100 helperr -v
+function helperr() {
     local err="$?"
 
     if [ -z "$err" ] || [ "$err" = "0" ]; then
@@ -108,11 +120,11 @@ function _shut_gendesk_helperr() {
         helpout >&2
     fi
 
-    printf >&2 "\n  $message\n\n"
+    logerr "$message"
     echo $err
 }
 
-function _shut_gendesk_getParameterHelper() {
+function getParameterHelper() {
     local DIRNAME="$(dirname "$0")"
     local PARAMETER_HELPER="$DIRNAME/shut_parameterHelper.sh"
 
@@ -120,15 +132,14 @@ function _shut_gendesk_getParameterHelper() {
         if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
             PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
         else
-            echo >&2 "Erro! \"$PARAMETER_HELPER_NAME\" não encontrado!"
-            return $ERR_NOT_FOUND_PARAMETER_HELPER
+            return $(m="Erro! \"$PARAMETER_HELPER_NAME\"" e=$ERR_NOT_FOUND_PARAMETER_HELPER helperr)
         fi
     fi
 
     echo $PARAMETER_HELPER
 }
 
-function _shut_gendesk_adapter() {
+function adapter() {
     local rt="$1"
 
     if [ -f "$rt" ] && [[ "$rt" != /* ]]; then
@@ -148,17 +159,17 @@ function _shut_gendesk_adapter() {
     echo "$rt"
 }
 
-function _shut_gendesk_main() {
-    local PARAMETER_HELPER="$(_shut_gendesk_getParameterHelper)" || return $?
+function main() {
+    local PARAMETER_HELPER="$(getParameterHelper)" || return $?
 
     if [ $# -eq 0 ]; then
-        return $(m="Erro! Argumentos vazios" e=$ERR_EMPTY_ARGUMENTS _shut_gendesk_helperr -v)
+        return $(m="Erro! Argumentos vazios" e=$ERR_EMPTY_ARGUMENTS helperr -v)
     fi
 
-    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out n e i c f fe ct d @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" _shut_gendesk_helperr -v)
+    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out n e i c f fe ct d @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
 
     if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
-        _shut_gendesk_helpout autor || return $?
+        helpout autor || return $?
         return 0
     fi
 
@@ -305,11 +316,11 @@ function _shut_gendesk_main() {
     # Verificando existência de argumentos obrigatórios
 
     if [ -z "$name" ]; then
-        return $(m="Erro! --name não informado!" e=$ERR_EMPTY_NAME_ARG _shut_gendesk_helperr -v)
+        return $(m="Erro! --name não informado!" e=$ERR_EMPTY_NAME_ARG helperr -v)
     fi
 
     if [ -z "$exec" ]; then
-        return $(m="Erro! --exec não informado!" e=$ERR_EMPTY_EXEC_ARG _shut_gendesk_helperr -v)
+        return $(m="Erro! --exec não informado!" e=$ERR_EMPTY_EXEC_ARG helperr -v)
     fi
 
     # Adaptando valores de argumentos
@@ -333,8 +344,8 @@ function _shut_gendesk_main() {
         dirname="${dirname:0:last_dirname}"
     fi
 
-    exec="$(_shut_gendesk_adapter "$exec" --is-exec)" || return $?
-    icon="$(_shut_gendesk_adapter "$icon")" || return $?
+    exec="$(adapter "$exec" --is-exec)" || return $?
+    icon="$(adapter "$icon")" || return $?
 
     # Gerando o o [Desktop Entry]
 
@@ -356,4 +367,4 @@ comment=$comment"
     fi
 }
 
-_shut_gendesk_main "$@" # Executa a função principal
+main "$@" # Executa a função principal
