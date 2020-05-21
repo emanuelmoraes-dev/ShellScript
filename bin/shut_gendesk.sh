@@ -15,9 +15,8 @@ ERR_EMPTY_EXEC_ARG=73
 function _shut_gendesk_helpout() {
     echo
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
-    echo "    qualquer no menu do sistema. Se o usuário for root, cria-se um arquivo"
-    echo "    \".desktop\" em /usr/share/applications. Caso contrário, cria-se o arquivo"
-    echo "    em $HOME/.local/share/applications. Os parâmetros que iniciam por -- possuem"
+    echo "    qualquer no menu do sistema. Caso contrário, cria-se o arquivo em"
+    echo "    $HOME/.local/share/applications. Os parâmetros que iniciam por -- possuem"
     echo "    maior prioridade"
     echo
     echo "    Parâmetros Nomeados:"
@@ -32,8 +31,14 @@ function _shut_gendesk_helpout() {
     echo "        --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o"
     echo "            mesmo valor presente no parâmetro --name"
     echo "        --flag-exec: Flags a serem inseridas ao final do conteúdo da chave"
-    echo "            'Exec' do [Desktop Entry]. Opcional"
+    echo "            'exec' do [Desktop Entry]. Opcional"
     echo "        --comment: Comentário sobre a aplicação. Opcional"
+	echo "        --dirname: Diretório onde o arquivo .desktop será gerado. Se não"
+	echo "            Se não informado e o usuário for root, cria-se o arquivo em"
+	echo "            /usr/share/applications. Se o usuário não for root, cria-se"
+	echo "            o arquivo em $HOME/.local/share/applications"
+	echo "        --out: Se esta flag for informada, nenhum arquivo será gerado e o"
+	echo "            conteúdo que seria gerado no arquivo é exibido na saída padrão"
     echo
     echo "    Atalhos:"
     echo "        -n = --name"
@@ -43,6 +48,7 @@ function _shut_gendesk_helpout() {
     echo "        -f = --filename"
     echo "        -fe = --flag-exec"
     echo "        -ct = --comment"
+    echo "        -d = --dirname"
     echo
     echo "    Parâmetros Posicionais:"
     echo "        0: Equivalente ao parâmetro nomeado --name"
@@ -52,6 +58,7 @@ function _shut_gendesk_helpout() {
     echo "        4: Equivalente ao parâmetro nomeado --filename"
     echo "        5: Equivalente ao parâmetro nomeado --flag-exec"
     echo "        6: Equivalente ao parâmetro nomeado --comment"
+    echo "        7: Equivalente ao parâmetro nomeado --dirname"
     echo
     echo "    Exemplos de Uso:"
     echo
@@ -148,7 +155,7 @@ function _shut_gendesk_main() {
         return $(m="Erro! Argumentos vazios" e=$ERR_EMPTY_ARGUMENTS _shut_gendesk_helperr -v)
     fi
 
-    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment n e i c f fe ct @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" _shut_gendesk_helperr -v)
+    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out n e i c f fe ct d @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" _shut_gendesk_helperr -v)
 
     if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
         _shut_gendesk_helpout autor || return $?
@@ -157,26 +164,29 @@ function _shut_gendesk_main() {
 
     # Arrays dos parâmetros de atalho
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[9]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[11]}" || return $?
     args_shortcut_name=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[10]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[12]}" || return $?
     args_shortcut_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[11]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
     args_shortcut_icon=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[12]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
     args_shortcut_categories=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
     args_shortcut_filename=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[16]}" || return $?
     args_shortcut_flag_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[17]}" || return $?
     args_shortcut_comment=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[18]}" || return $?
+    args_shortcut_dirname=("${shut_util_return[@]}")
 
     # Arrays dos parâmetros nomeados
 
@@ -204,111 +214,145 @@ function _shut_gendesk_main() {
     shut_util_array $'\n' "${shut_parameterHelper_args[8]}" || return $?
     args_comment=("${shut_util_return[@]}")
 
-    Name="${args_default[0]}"
-    Exec="${args_default[1]}"
-    Icon="${args_default[2]}"
-    Categories="$(shut_util_join \; ${args_default[3]})" || return $?
-    Filename="${args_default[4]}"
-    FlagExec="${args_default[5]}"
-    Comment="${args_default[6]}"
+    shut_util_array $'\n' "${shut_parameterHelper_args[9]}" || return $?
+    args_dirname=("${shut_util_return[@]}")
+
+    name="${args_default[0]}"
+    exec="${args_default[1]}"
+    icon="${args_default[2]}"
+    categories="$(shut_util_join \; ${args_default[3]})" || return $?
+    filename="${args_default[4]}"
+    flag_exec="${args_default[5]}"
+    comment="${args_default[6]}"
+    dirname="${args_default[7]}"
 
     # Parâmetros de atalho
 
-    if [ ${shut_parameterHelper_exists[9]} -eq 1 ]; then
-        Name="${args_shortcut_name[@]}"
-    fi
-
-    if [ ${shut_parameterHelper_exists[10]} -eq 1 ]; then
-        Exec="${args_shortcut_exec[@]}"
-    fi
-
     if [ ${shut_parameterHelper_exists[11]} -eq 1 ]; then
-        Icon="${args_shortcut_icon[@]}"
+        name="${args_shortcut_name[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[12]} -eq 1 ]; then
-        Categories="$(shut_util_join \; ${args_shortcut_categories[@]})" || return $?
+        exec="${args_shortcut_exec[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[13]} -eq 1 ]; then
-        Filename="${args_shortcut_filename[@]}"
+        icon="${args_shortcut_icon[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[14]} -eq 1 ]; then
-        FlagExec="${args_shortcut_flag_exec[@]}"
+        categories="$(shut_util_join \; ${args_shortcut_categories[@]})" || return $?
     fi
 
     if [ ${shut_parameterHelper_exists[15]} -eq 1 ]; then
-        Comment="${args_shortcut_comment[@]}"
+        filename="${args_shortcut_filename[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[16]} -eq 1 ]; then
+        flag_exec="${args_shortcut_flag_exec[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[17]} -eq 1 ]; then
+        comment="${args_shortcut_comment[@]}"
+    fi
+
+    if [ ${shut_parameterHelper_exists[18]} -eq 1 ]; then
+        dirname="${args_shortcut_dirname}"
     fi
 
     # Parâmetros nomeados
 
     if [ ${shut_parameterHelper_exists[2]} -eq 1 ]; then
-        Name="${args_name[@]}"
+        name="${args_name[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[3]} -eq 1 ]; then
-        Exec="${args_exec[@]}"
+        exec="${args_exec[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[4]} -eq 1 ]; then
-        Icon="${args_icon[@]}"
+        icon="${args_icon[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[5]} -eq 1 ]; then
-        Categories="$(shut_util_join \; ${args_categories[@]})" || return $?
+        categories="$(shut_util_join \; ${args_categories[@]})" || return $?
     fi
 
     if [ ${shut_parameterHelper_exists[6]} -eq 1 ]; then
-        Filename="${args_filename[@]}"
+        filename="${args_filename[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[7]} -eq 1 ]; then
-        FlagExec="${args_flag_exec[@]}"
+        flag_exec="${args_flag_exec[@]}"
     fi
 
     if [ ${shut_parameterHelper_exists[8]} -eq 1 ]; then
-        Comment="${args_comment[@]}"
+        comment="${args_comment[@]}"
     fi
 
-    if [ -z "$Name" ]; then
+    if [ ${shut_parameterHelper_exists[9]} -eq 1 ]; then
+        dirname="${args_dirname[@]}"
+    fi
+
+    # Verificando se argumento --out está presente
+
+    present_out=0
+
+    if [ ${shut_parameterHelper_exists[10]} -eq 1 ]; then
+        present_out=1
+    fi
+
+    # Verificando existência de argumentos obrigatórios
+
+    if [ -z "$name" ]; then
         return $(m="Erro! --name não informado!" e=$ERR_EMPTY_NAME_ARG _shut_gendesk_helperr -v)
     fi
 
-    if [ -z "$Exec" ]; then
+    if [ -z "$exec" ]; then
         return $(m="Erro! --exec não informado!" e=$ERR_EMPTY_EXEC_ARG _shut_gendesk_helperr -v)
     fi
 
-    if [ -z "$Filename" ]; then
-        Filename="$Name"
+    # Adaptando valores de argumentos
+
+    if [ -z "$filename" ]; then
+        filename="$name"
     fi
 
-    Exec="$(_shut_gendesk_adapter "$Exec" --is-exec)" || return $?
-    Icon="$(_shut_gendesk_adapter "$Icon")" || return $?
+    if [ -z "$dirname" ]; then
+        if [ "$(id -u)" = "0" ]; then
+            dirname="/usr/share/applications"
+        else
+            dirname="$HOME/.local/share/applications"
+        fi
+    fi
 
-    if [ "$(id -u)" = "0" ]; then
-        echo "\
+    local last_dirname=${#dirname}
+    let last_dirname=$last_dirname-1
+
+    if [ "${dirname:last_dirname:1}" = "/" ]; then
+        dirname="${dirname:0:last_dirname}"
+    fi
+
+    exec="$(_shut_gendesk_adapter "$exec" --is-exec)" || return $?
+    icon="$(_shut_gendesk_adapter "$icon")" || return $?
+
+    # Gerando o o [Desktop Entry]
+
+    desktop_entry="\
 [Desktop Entry]
 Encoding=UTF-8
 Type=Application
 Terminal=false
-Name=$Name
-Exec=$Exec $FlagExec
-Icon=$Icon
-Categories=$Categories
-Comment=$Comment" >"/usr/share/applications/$Filename.desktop"
+name=$name
+exec=$exec $flag_exec
+icon=$icon
+categories=$categories
+comment=$comment"
+
+    if [ $present_out -eq 1 ]; then
+        echo "$desktop_entry"
     else
-        echo "\
-[Desktop Entry]
-Encoding=UTF-8
-Type=Application
-Terminal=false
-Name=$Name
-Exec=$Exec $FlagExec
-Icon=$Icon
-Categories=$Categories
-Comment=$Comment" >"$HOME/.local/share/applications/$Filename.desktop"
+        echo "$desktop_entry" > "$dirname/$filename.desktop"
     fi
 }
 
