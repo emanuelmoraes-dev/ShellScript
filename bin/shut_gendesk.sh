@@ -3,6 +3,15 @@
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 PARAMETER_HELPER_NAME="parameter-helper"
 
+# CÓDIGOS DE ERRO DO SCRIPT (60-89)
+ERR_UNEXPECTED=60
+## NOT FOUND (6X)
+ERR_NOT_FOUND_PARAMETER_HELPER=61
+## EMPTY (7X)
+ERR_EMPTY_ARGUMENTS=71
+ERR_EMPTY_NAME_ARG=72
+ERR_EMPTY_EXEC_ARG=73
+
 function _shut_gendesk_helpout() {
     echo
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
@@ -68,15 +77,32 @@ function _shut_gendesk_helpout() {
     fi
 }
 
+# Ecoa mensagem de erro em erro padrão e código do erro em saída padrão
+#
+#EX: m="Erro interno! Algo inesperado ocorreu" e=100 _shut_gendesk_helperr -v
 function _shut_gendesk_helperr() {
-    local message="$1"
+    local err="$?"
 
-    if [ -z "$message" ]; then
-        message="Erro! Argumentos Inválidos"
+    if [ -z "$err" ] || [ "$err" = "0" ]; then
+        err=$ERR_UNEXPECTED
     fi
 
-    _shut_gendesk_helpout >&2 # Executa função para exibir ajuda
-    printf >&2 "\n$message\n\n"
+    if [ "$e" ]; then
+        err=$e
+    fi
+
+    local message="$m"
+
+    if [ -z "$message" ]; then
+        message="Erro interno! Algo inesperado ocorreu. Código: $_err!"
+    fi
+
+    if [ "$1" == "-v" ]; then
+        helpout >&2
+    fi
+
+    printf >&2 "\n  $message\n\n"
+    echo $err
 }
 
 function _shut_gendesk_getParameterHelper() {
@@ -88,7 +114,7 @@ function _shut_gendesk_getParameterHelper() {
             PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
         else
             echo >&2 "Erro! \"$PARAMETER_HELPER_NAME\" não encontrado!"
-            return 100
+            return $ERR_NOT_FOUND_PARAMETER_HELPER
         fi
     fi
 
@@ -119,11 +145,10 @@ function _shut_gendesk_main() {
     local PARAMETER_HELPER="$(_shut_gendesk_getParameterHelper)" || return $?
 
     if [ $# -eq 0 ]; then
-        _shut_gendesk_helperr "Erro! Argumentos vazios"
-        return 101
+        return $(m="Erro! Argumentos vazios" e=$ERR_EMPTY_ARGUMENTS _shut_gendesk_helperr -v)
     fi
 
-    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment n e i c f fe ct @@ --default "$@" || (err="$?"; _shut_gendesk_helperr; return $err )
+    source $PARAMETER_HELPER --create-exists-array --params -help -default -name -exec -icon -categories -filename -flag-exec -comment n e i c f fe ct @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" _shut_gendesk_helperr -v)
 
     if [ ${shut_parameterHelper_exists[0]} -eq 1 ]; then
         _shut_gendesk_helpout autor || return $?
@@ -248,13 +273,11 @@ function _shut_gendesk_main() {
     fi
 
     if [ -z "$Name" ]; then
-        _shut_gendesk_helperr "Erro! --name não informado!"
-        return 102
+        return $(m="Erro! --name não informado!" e=$ERR_EMPTY_NAME_ARG _shut_gendesk_helperr -v)
     fi
 
     if [ -z "$Exec" ]; then
-        _shut_gendesk_helperr "Erro! --exec não informado!"
-        return 103
+        return $(m="Erro! --exec não informado!" e=$ERR_EMPTY_EXEC_ARG _shut_gendesk_helperr -v)
     fi
 
     if [ -z "$Filename" ]; then

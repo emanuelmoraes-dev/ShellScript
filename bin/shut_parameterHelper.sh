@@ -3,6 +3,16 @@
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 SHUT_UTIL_NAME="shut-util"
 
+# CÓDIGOS DE ERRO DO SCRIPT (30-59)
+## NOT FOUND (3X)
+ERR_NOT_FOUND_SHUT_UTIL=31
+ERR_NOT_FOUND_SHUT_UTIL_CONTAINS=32
+## EMPTY (4X)
+ERR_EMPTY_PARAMS=41
+## INVALID (5X)
+ERR_INVALID_PARAMETER=52
+ERR_INVALID_ARGUMENTS=53
+
 function _shut_parameterHelper_helpout() {
     echo
     echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros"
@@ -97,7 +107,7 @@ function _shut_parameterHelper_import() {
             UTIL="$SHUT_UTIL_NAME"
         else
             echo >&2 "Erro! \"$SHUT_UTIL_NAME\" não encontrado!"
-            return 5
+            return $ERR_NOT_FOUND_SHUT_UTIL
         fi
     fi
 
@@ -183,7 +193,7 @@ function _shut_parameterHelper_main() {
 
         elif [ $start_args -eq 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
 
-            shut_util_contains || return 1
+            shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
 
             if shut_util_contains "$a" "${params[@]}"; then
                 param="$a"                             # 'param' recebe o argumento
@@ -192,7 +202,7 @@ function _shut_parameterHelper_main() {
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
             elif [ "$present_no_strict" = "0" ]
                 echo >$2 "Erro! Parâmetro $a inválido!"
-                return 2 # Finaliza Script com erro
+                return $ERR_INVALID_PARAMETER # Finaliza Script com erro
             fi
 
         elif [ $start_args -eq 1 ]; then
@@ -202,7 +212,7 @@ function _shut_parameterHelper_main() {
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                 echo >$2 "Erro Interno! Contate o desenvolvedor. --params vazios!"
-                return 3 # Finaliza Script com erro
+                return $ERR_EMPTY_PARAMS # Finaliza Script com erro
             fi
 
             len_params=${#params[@]}
@@ -221,16 +231,16 @@ function _shut_parameterHelper_main() {
             done
         else
             echo >$2 "Erro! Argumentos Inválidos!"
-            return 4 # Finaliza Script com erro
+            return $ERR_INVALID_ARGUMENTS # Finaliza Script com erro
         fi
     done
 
     if [ $present_exists -eq 1 ]; then
-        shut_util_contains || return 1
+        shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
         shut_util_contains "${params[index]}" "${used_params[@]}"
     else
         if [ $present_create_exists_array -eq 1 ]; then
-            shut_util_contains || return 1
+            shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
             for ((i = 0; i < len_params; i++)); do
                 if shut_util_contains "${params[i]}" "${used_params[@]}"; then
                     shut_parameterHelper_exists[$i]=1
