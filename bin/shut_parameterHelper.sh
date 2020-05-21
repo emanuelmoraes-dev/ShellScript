@@ -200,7 +200,7 @@ function _shut_parameterHelper_main() {
                 len_used_params=${#used_params[@]}     # Tamanho do array "used_params"
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
-            elif [ "$present_no_strict" = "0" ]
+            elif [ "$present_no_strict" = "0" ]; then
                 echo >$2 "Erro! Parâmetro $a inválido!"
                 return $ERR_INVALID_PARAMETER # Finaliza Script com erro
             fi
