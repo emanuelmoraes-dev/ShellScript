@@ -7,6 +7,8 @@ PARAMETER_HELPER_NAME="parameter-helper"
 ERR_6X8X_UNEXPECTED=60
 ## NOT FOUND (6X)
 ERR_6X8X_NOT_FOUND_PARAMETER_HELPER=61
+ERR_6X8X_NOT_FOUND_NAME=62
+ERR_6X8X_NOT_FOUND_EXEC=63
 ## EMPTY (7X)
 ERR_6X8X_EMPTY_ARGUMENTS=71
 ERR_6X8X_EMPTY_NAME_ARG=72
@@ -49,11 +51,13 @@ function helpout {
 	echo "        --dirname: Diretório onde o arquivo .desktop será gerado. Se não"
 	echo "            Se não informado e o usuário for root, cria-se o arquivo em"
 	echo "            /usr/share/applications. Se o usuário não for root, cria-se"
-	echo "            o arquivo em $HOME/.local/share/applications. Opcional"
+	echo "            o arquivo em $HOME/.local/share/applications."
+    echo "            Opcional"
 	echo "        --out: Se esta flag for informada, nenhum arquivo será gerado e o"
 	echo "            conteúdo que seria gerado no arquivo é exibido na saída padrão."
-    echo "            Este parâmetro NÃO deve ser passado antes dos argumentos"
-    echo "            posicionais. Opcional"
+    echo "            Opcional"
+    echo "        --replace-file: Se esta flag for informada e se já ouver um arquivo"
+    echo "            .desktop, tal arquivo será reescrito, ao invés de concatenado"
     echo
     echo "    Atalhos:"
     echo "        -n = --name"
@@ -64,6 +68,7 @@ function helpout {
     echo "        -fe = --flag-exec"
     echo "        -ct = --comment"
     echo "        -d = --dirname"
+    echo "        -rf = --replace-file"
     echo
     echo "    Parâmetros Posicionais:"
     echo "        0: Equivalente ao parâmetro nomeado --name"
@@ -179,7 +184,7 @@ function adapter {
 
 # Processa os parâmetros passados pelo usuário
 function parameters {
-    source $PARAMETER_HELPER --create-exists-array --params -help -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out n e i c f fe ct d @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
+    source $PARAMETER_HELPER --create-exists-array --flag-params -out --params -help -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
 
     present_help=0
 
@@ -220,32 +225,6 @@ function parameters {
     shut_util_array $'\n' "${shut_parameterHelper_args[10]}" || return $?
     args_dirname=("${shut_util_return[@]}")
 
-    # Arrays dos parâmetros de atalho
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[12]}" || return $?
-    args_shortcut_name=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
-    args_shortcut_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
-    args_shortcut_icon=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
-    args_shortcut_categories=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[16]}" || return $?
-    args_shortcut_filename=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[17]}" || return $?
-    args_shortcut_flag_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[18]}" || return $?
-    args_shortcut_comment=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[19]}" || return $?
-    args_shortcut_dirname=("${shut_util_return[@]}")
-
     # Verificando se argumento --out está presente
 
     if [ -z "$present_out" ]; then
@@ -254,6 +233,48 @@ function parameters {
 
     if [ "${shut_parameterHelper_exists[11]}" = 1 ]; then
         present_out=1
+    fi
+
+    # Verificando se argumento --replace-file está presente
+
+    if [ -z "$present_replace_file" ]; then
+        present_replace_file=0
+    fi
+
+    if [ "${shut_parameterHelper_exists[12]}" = 1 ]; then
+        present_replace_file=1
+    fi
+
+    # Arrays dos parâmetros de atalho
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
+    args_shortcut_name=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
+    args_shortcut_exec=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
+    args_shortcut_icon=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[16]}" || return $?
+    args_shortcut_categories=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[17]}" || return $?
+    args_shortcut_filename=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[18]}" || return $?
+    args_shortcut_flag_exec=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[19]}" || return $?
+    args_shortcut_comment=("${shut_util_return[@]}")
+
+    shut_util_array $'\n' "${shut_parameterHelper_args[20]}" || return $?
+    args_shortcut_dirname=("${shut_util_return[@]}")
+
+    # Verificando se argumento -rf está presente
+
+    if [ "${shut_parameterHelper_exists[21]}" = 1 ]; then
+        present_replace_file=1
     fi
 
     # Atribui os valores de --default
@@ -352,11 +373,25 @@ function parameters {
 function run {
     local endl=$'\n' # Quebra de linha
 
-    parameters "$@" # Processa os parâmetros passados pelo usuário
+    parameters "$@" || return $? # Processa os parâmetros passados pelo usuário
 
     if [ "$present_help" = 1 ]; then
         helpout autor || return $?
         return 0
+    fi
+
+    local str_args="$@"
+
+    if [ "$str_args" = "--out" ]; then
+        return 0
+    fi
+
+    # Transforma path relativo em path absoluto
+
+    exec="$(adapter "$exec" --is-exec)" || return $?
+
+    if [ "$icon" ]; then
+        icon="$(adapter "$icon")" || return $?
     fi
 
     # Adaptando valores de argumentos
@@ -384,19 +419,9 @@ function run {
         lang="[$lang]"
     fi
 
-    # Transforma path relativo em path absoluto
-
-    if [ "$exec" ]; then
-        exec="$(adapter "$exec" --is-exec)" || return $?
-    fi
-
-    if [ "$icon" ]; then
-        icon="$(adapter "$icon")" || return $?
-    fi
-
     # Gerando [Desktop Entry]
 
-    if [ -z "$desktop_entry" ] && [ -f "$dirname/$filename.desktop" ]; then
+    if [ -z "$desktop_entry" ] && [ "$present_replace_file" = 0 ] && [ "$filename" ] && [ -f "$dirname/$filename.desktop" ]; then
         desktop_entry="$(cat "$dirname/$filename.desktop")"
     fi
 
@@ -468,7 +493,7 @@ function main {
 
         if [ "$index_lang" != "-1" ]; then
             if [ "${#iargs[@]}" -gt 0 ]; then
-                run "${iargs[@]}" $lang_args # Gera [Desktop Entry]
+                run "${iargs[@]}" $lang_args || return $? # Gera [Desktop Entry]
             fi
 
             let index_lang=$index_lang+1
@@ -478,12 +503,22 @@ function main {
             args=("${args[@]:index_lang}")
         else
             if [ "${#args[@]}" -gt 0 ]; then
-                run "${args[@]}" $lang_args
+                run "${args[@]}" $lang_args || return $? # Gera [Desktop Entry]
             fi
 
             args=()
         fi
     done
+
+    # Verificando existência de argumentos obrigatórios
+
+    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep -E \"Name=|Name\[.*\]=\"")" ]; then
+        return $(m="Erro! O parâmetro --name é obrigatório!" e=$ERR_6X8X_NOT_FOUND_NAME helperr -v)
+    fi
+
+    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Exec=\"")" ]; then
+        return $(m="Erro! O parâmetro --exec é obrigatório!" e=$ERR_6X8X_NOT_FOUND_EXEC helperr -v)
+    fi
 
     if [ "$desktop_entry" ]; then
         if [ "$present_out" = 1 ]; then
