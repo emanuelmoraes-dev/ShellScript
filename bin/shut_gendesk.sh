@@ -354,11 +354,11 @@ function main() {
 Encoding=UTF-8
 Type=Application
 Terminal=false
-name=$name
-exec=$exec $flag_exec
-icon=$icon
-categories=$categories
-comment=$comment"
+Name=$name
+Exec=$exec $flag_exec
+Icon=$icon
+Categories=$categories
+Comment=$comment"
 
     if [ $present_out -eq 1 ]; then
         echo "$desktop_entry"
