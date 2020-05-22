@@ -201,7 +201,7 @@ function _shut_parameterHelper_main() {
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
             elif [ "$present_no_strict" = "0" ]; then
-                echo >$2 "Erro! Parâmetro $a inválido!"
+                echo >&2 "Erro! Parâmetro $a inválido!"
                 return $ERR_INVALID_PARAMETER # Finaliza Script com erro
             fi
 
@@ -211,7 +211,7 @@ function _shut_parameterHelper_main() {
             fi
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
-                echo >$2 "Erro Interno! Contate o desenvolvedor. --params vazios!"
+                echo >&2 "Erro Interno! Contate o desenvolvedor. --params vazios!"
                 return $ERR_EMPTY_PARAMS # Finaliza Script com erro
             fi
 
@@ -230,7 +230,7 @@ function _shut_parameterHelper_main() {
                 fi
             done
         else
-            echo >$2 "Erro! Argumentos Inválidos!"
+            echo >&2 "Erro! Argumentos Inválidos!"
             return $ERR_INVALID_ARGUMENTS # Finaliza Script com erro
         fi
     done
