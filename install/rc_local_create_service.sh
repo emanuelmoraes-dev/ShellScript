@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function helpout() {
+function helpout {
     echo "    Script que cria e define o serviço de executar um arquivo com permissões"
     echo "    administrativas ao iniciar o computador"
     echo

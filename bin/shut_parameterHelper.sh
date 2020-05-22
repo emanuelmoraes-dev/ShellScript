@@ -5,15 +5,16 @@ SHUT_UTIL_NAME="shut-util"
 
 # CÓDIGOS DE ERRO DO SCRIPT (30-59)
 ## NOT FOUND (3X)
-ERR_NOT_FOUND_SHUT_UTIL=31
-ERR_NOT_FOUND_SHUT_UTIL_CONTAINS=32
+ERR_3X5X_NOT_FOUND_SHUT_UTIL=31
+ERR_3X5X_NOT_FOUND_SHUT_UTIL_CONTAINS=32
 ## EMPTY (4X)
-ERR_EMPTY_PARAMS=41
+ERR_3X5X_EMPTY_PARAMS=41
+ERR_3X5X_EMPTY_ARGS=42
 ## INVALID (5X)
-ERR_INVALID_PARAMETER=52
-ERR_INVALID_ARGUMENTS=53
+ERR_3X5X_INVALID_PARAMETER=52
+ERR_3X5X_INVALID_ARGUMENTS=53
 
-function _shut_parameterHelper_helpout() {
+function _shut_parameterHelper_helpout {
     echo
     echo "    Utilitário cujo objetivo é receber um conjunto de parâmetros"
     echo "    nomeados e separar os valores de seus parâmetros. Se usado com"
@@ -71,7 +72,7 @@ function _shut_parameterHelper_helpout() {
     echo "        v1=(\"\${shut_util_return[@]}\") # Array vazio"
     echo
     echo "        # Se o parâmetro --nome foi passado"
-    echo "        if [ \"\${shut_parameterHelper_exists[1]}\" -eq 1 ]; then"
+    echo "        if [ \"\${shut_parameterHelper_exists[1]}\" = 1 ]; then"
     echo
     echo "            shut_util_array $'\n' \"\${shut_parameterHelper_args[1]}\""
     echo
@@ -98,7 +99,7 @@ function _shut_parameterHelper_helpout() {
     echo
 }
 
-function _shut_parameterHelper_import() {
+function _shut_parameterHelper_import {
     local DIRNAME="$(dirname "$0")"
     local UTIL="$DIRNAME/shut_util.sh"
 
@@ -107,7 +108,7 @@ function _shut_parameterHelper_import() {
             UTIL="$SHUT_UTIL_NAME"
         else
             echo >&2 "Erro! \"$SHUT_UTIL_NAME\" não encontrado!"
-            return $ERR_NOT_FOUND_SHUT_UTIL
+            return $ERR_3X5X_NOT_FOUND_SHUT_UTIL
         fi
     fi
 
@@ -117,7 +118,7 @@ function _shut_parameterHelper_import() {
 shut_parameterHelper_args=()   # Array resposta do script
 shut_parameterHelper_exists=() # Array para informar se cada parâmetro de cada posição foi infomado (0 - não, 1 - sim)
 
-function _shut_parameterHelper_main() {
+function _shut_parameterHelper_main {
     _shut_parameterHelper_import || return $? # Importa utilitários
 
     if [ "$1" = "--help" ]; then
@@ -139,9 +140,14 @@ function _shut_parameterHelper_main() {
     local used_params=()                # Parâmetros nomeados usados
     local len_params=0                  # Quantidade de parâmetros já registrados
 
+    if [ "$#" = 0 ]; then
+        echo >&2 "Erro! Argumentos não definidos!"
+        return $ERR_3X5X_EMPTY_ARGS
+    fi
+
     for a in "$@"; do # Percorre todos os argumentos passados pelo usuário
 
-        if [ $start_args -eq 0 ] && (
+        if [ "$start_args" = 0 ] && (
             [ "$a" = "--params" ] ||
                 [ "$a" = "--index" ] ||
                 [ "$a" = "--sep" ] ||
@@ -173,27 +179,27 @@ function _shut_parameterHelper_main() {
                 start_args=1
             fi
 
-        elif [ $start_args -eq 0 ] && [ "$param" = "--index" ]; then
+        elif [ "$start_args" = 0 ] && [ "$param" = "--index" ]; then
 
             index="$a"
 
-        elif [ $start_args -eq 0 ] && [ "$param" = "--sep" ]; then
+        elif [ "$start_args" = 0 ] && [ "$param" = "--sep" ]; then
 
             sep="$a"
 
-        elif [ $start_args -eq 0 ] && [ "$param" = "--is-param" ]; then
+        elif [ "$start_args" = 0 ] && [ "$param" = "--is-param" ]; then
 
             is_param="$a"
 
-        elif [ $start_args -eq 0 ] && [ "$param" = "--params" ]; then # Se 'param' é o parâmetro para setar os parâmetros
+        elif [ "$start_args" = 0 ] && [ "$param" = "--params" ]; then # Se 'param' é o parâmetro para setar os parâmetros
 
             len_params=${#params[@]}                  # Tamanho do array
             params[$len_params]="${is_param}${a}"     # Adiciona no fim do array de 'params' o argumento
             shut_parameterHelper_args[$len_params]="" # Adiciona no fim do array de 'shut_parameterHelper_args' uma string vazia
 
-        elif [ $start_args -eq 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
+        elif [ "$start_args" = 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
 
-            shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
+            shut_util_contains || return $ERR_3X5X_NOT_FOUND_SHUT_UTIL_CONTAINS
 
             if shut_util_contains "$a" "${params[@]}"; then
                 param="$a"                             # 'param' recebe o argumento
@@ -202,24 +208,24 @@ function _shut_parameterHelper_main() {
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
             elif [ "$present_no_strict" = "0" ]; then
                 echo >&2 "Erro! Parâmetro $a inválido!"
-                return $ERR_INVALID_PARAMETER # Finaliza Script com erro
+                return $ERR_3X5X_INVALID_PARAMETER # Finaliza Script com erro
             fi
 
-        elif [ $start_args -eq 1 ]; then
-            if [ $present_exists -eq 1 ]; then # Se houver a opção --exists
+        elif [ "$start_args" = 1 ]; then
+            if [ "$present_exists" = 1 ]; then # Se houver a opção --exists
                 continue                       # Os valores não precisam ser armazenados
             fi
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                 echo >&2 "Erro Interno! Contate o desenvolvedor. --params vazios!"
-                return $ERR_EMPTY_PARAMS # Finaliza Script com erro
+                return $ERR_3X5X_EMPTY_PARAMS # Finaliza Script com erro
             fi
 
             len_params=${#params[@]}
             for ((i = 0; i < len_params; i++)); do # Percorre a lista de parâmetros
                 local_param="${params[i]}"
                 if [ "$param" = "$local_param" ]; then # Se o 'param' foi encontrado na lista de parâmetros
-                    if [ $empty_param -eq 1 ]; then
+                    if [ "$empty_param" = 1 ]; then
                         shut_parameterHelper_args[$i]="$a" # Um novo valor para o parâmetro de posição 'i'
                         empty_param=0
                     else
@@ -231,16 +237,16 @@ function _shut_parameterHelper_main() {
             done
         else
             echo >&2 "Erro! Argumentos Inválidos!"
-            return $ERR_INVALID_ARGUMENTS # Finaliza Script com erro
+            return $ERR_3X5X_INVALID_ARGUMENTS # Finaliza Script com erro
         fi
     done
 
-    if [ $present_exists -eq 1 ]; then
-        shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
+    if [ "$present_exists" = 1 ]; then
+        shut_util_contains || return $ERR_3X5X_NOT_FOUND_SHUT_UTIL_CONTAINS
         shut_util_contains "${params[index]}" "${used_params[@]}"
     else
-        if [ $present_create_exists_array -eq 1 ]; then
-            shut_util_contains || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS
+        if [ "$present_create_exists_array" = 1 ]; then
+            shut_util_contains || return $ERR_3X5X_NOT_FOUND_SHUT_UTIL_CONTAINS
             for ((i = 0; i < len_params; i++)); do
                 if shut_util_contains "${params[i]}" "${used_params[@]}"; then
                     shut_parameterHelper_exists[$i]=1
@@ -250,7 +256,7 @@ function _shut_parameterHelper_main() {
             done
         fi
 
-        if [ $present_out -eq 1 ]; then
+        if [ "$present_out" = 1 ]; then
             printf "%s\n" "${shut_parameterHelper_args[index]}" # Retorna os valores do parâmetro da posição '--index'
         fi
     fi

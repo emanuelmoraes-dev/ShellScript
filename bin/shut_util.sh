@@ -10,9 +10,7 @@
 # de um separador
 #
 # shut_util_join "<sep>" "${<array>[@]}"
-#
-# shut_util_join --help # show help
-function shut_util_join() {
+function shut_util_join {
     local sep="$1"
     shift
     local rt="$1"
@@ -30,10 +28,8 @@ function shut_util_join() {
 # contrário, a função é encerrada com erro
 #
 # shut_util_contains "<string>" "${<array>[@]}"
-#
-# shut_util_contains --help # show help
-function shut_util_contains() {
-    if [ $# -eq 0 ]; then
+function shut_util_contains {
+    if [ "$#" = 0 ]; then
         return 0
     fi
 
@@ -54,11 +50,9 @@ function shut_util_contains() {
 
 # Cria um array de uma string por meio de um separador
 #
-# shut_util_array "<separador>" <string>
+# shut_util_array "<separador>" "<string>"
 # array=("${shut_util_return[@]}") # array
-#
-# shut_util_array --help # show help
-function shut_util_array() {
+function shut_util_array {
     local sep="$1"
     local len_sep=${#sep}
     local i_last_sep
@@ -92,4 +86,28 @@ function shut_util_array() {
             shut_util_return[$i_return]="${shut_util_return[i_return]}${ch}"
         fi
     done
+}
+
+# Retorna na saída padrão o index da primeira
+# ocorrência de uma determinada string em um
+# array
+#
+# shut_util_findex "<string>" "${array[@]}"
+function shut_util_findex {
+    local target="$1"
+    shift
+
+    local index=-1
+    local i=0
+
+    while [ "$#" != 0 ]; do
+        if [ "$1" = "$target" ]; then
+            index=$i
+            break
+        fi
+        let i=$i+1
+        shift
+    done
+
+    echo $index
 }
