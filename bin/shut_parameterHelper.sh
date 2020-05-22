@@ -38,10 +38,15 @@ function _shut_parameterHelper_helpout {
     echo "        --params = Nomes dos parâmetros esperados para o usuário passar"
     echo "            (ignorando o valor de --is-param, que por padrão é '-')."
     echo "            Obrigatório"
+    echo "        --flag-params = Nomes dos parâmetros presentes em --params que"
+    echo "             não esperam nenhum valor. Um parâmetro marcado nesta opção"
+    echo "             pode ser inserido no meio dos valores de um outro parâmetro."
+    echo "             Opcional"
     echo "        --create-exists-array = Cria um array"
     echo "            (shut_parameterHelper_exists) para informar se cada parâmetro"
     echo "            de cada posição foi infomado pelo usuário (0 - não, 1 - sim)"
-    echo "        --no-strict = Impede o lançamento de erro por parâmetro desconhecido"
+    echo "        --no-strict = Impede o lançamento de erro por parâmetro"
+    echo "            desconhecido"
     echo "        @@ = Informa que os argumentos começarão a ser analizados."
     echo "            Obrigatório"
     echo
@@ -107,7 +112,7 @@ function _shut_parameterHelper_import {
         if type -P "$SHUT_UTIL_NAME" 1>/dev/null 2>/dev/null; then
             UTIL="$SHUT_UTIL_NAME"
         else
-            echo >&2 "Erro! \"$SHUT_UTIL_NAME\" não encontrado!"
+            printf >&2 "\e[31;1m\nErro! \"$SHUT_UTIL_NAME\" não encontrado!\e[m"
             return $ERR_3X5X_NOT_FOUND_SHUT_UTIL
         fi
     fi
@@ -137,11 +142,13 @@ function _shut_parameterHelper_main {
     local sep=$'\n'                     # Separador utilizado para separar os vários elementos de um array de valores passados pelo usuário
     local is_param="-"                  # String na qual todos os parâmetros nomeados devem começar
     local params=()                     # Parâmetros que serão esperados
+    local flag_params=()                # Parâmetros de --params que não esperam nenhum valor (marcados como flag)
     local used_params=()                # Parâmetros nomeados usados
     local len_params=0                  # Quantidade de parâmetros já registrados
+    local len_flag_params=0             # Quantidade de parâmetros já marcados como flag
 
     if [ "$#" = 0 ]; then
-        echo >&2 "Erro! Argumentos não definidos!"
+        printf >&2 "\e[31;1m\nErro! Argumentos não definidos!\e[m"
         return $ERR_3X5X_EMPTY_ARGS
     fi
 
@@ -149,14 +156,15 @@ function _shut_parameterHelper_main {
 
         if [ "$start_args" = 0 ] && (
             [ "$a" = "--params" ] ||
-                [ "$a" = "--index" ] ||
-                [ "$a" = "--sep" ] ||
-                [ "$a" = "--exists" ] ||
-                [ "$a" = "--create-exists-array" ] ||
-                [ "$a" = "--out" ] ||
-                [ "$a" = "--no-strict" ] ||
-                [ "$a" = "--is-param" ] ||
-                [ "$a" = "@@" ]
+            [ "$a" = "--flag-params" ] ||
+            [ "$a" = "--index" ] ||
+            [ "$a" = "--sep" ] ||
+            [ "$a" = "--exists" ] ||
+            [ "$a" = "--create-exists-array" ] ||
+            [ "$a" = "--out" ] ||
+            [ "$a" = "--no-strict" ] ||
+            [ "$a" = "--is-param" ] ||
+            [ "$a" = "@@" ]
         ); then
 
             param="$a"
@@ -197,17 +205,25 @@ function _shut_parameterHelper_main {
             params[$len_params]="${is_param}${a}"     # Adiciona no fim do array de 'params' o argumento
             shut_parameterHelper_args[$len_params]="" # Adiciona no fim do array de 'shut_parameterHelper_args' uma string vazia
 
+        elif [ "$start_args" = 0 ] && [ "$param" = "--flag-params" ]; then # Se 'param' é o parâmetro para setar os parâmetros marcados como flag
+
+            len_flag_params=${#flag_params[@]}                  # Tamanho do array
+            flag_params[$len_flag_params]="${is_param}${a}"     # Adiciona no fim do array de 'flag_params' o argumento
+
         elif [ "$start_args" = 1 ] && [[ "$a" == $is_param* ]]; then # Se o argumento for o nome de um parâmetro nomeado
 
             shut_util_contains || return $ERR_3X5X_NOT_FOUND_SHUT_UTIL_CONTAINS
 
-            if shut_util_contains "$a" "${params[@]}"; then
+            if shut_util_contains "$a" "${flag_params[@]}"; then
+                len_used_params=${#used_params[@]}     # Tamanho do array "used_params"
+                used_params[$len_used_params]="$a"     # Adiciona no final do array o parâmetro
+            elif shut_util_contains "$a" "${params[@]}"; then
                 param="$a"                             # 'param' recebe o argumento
                 len_used_params=${#used_params[@]}     # Tamanho do array "used_params"
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
             elif [ "$present_no_strict" = "0" ]; then
-                echo >&2 "Erro! Parâmetro $a inválido!"
+                printf >&2 "\e[31;1m\nErro! Parâmetro $a inválido!\e[m"
                 return $ERR_3X5X_INVALID_PARAMETER # Finaliza Script com erro
             fi
 
@@ -217,7 +233,7 @@ function _shut_parameterHelper_main {
             fi
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
-                echo >&2 "Erro Interno! Contate o desenvolvedor. --params vazios!"
+                printf >&2 "\e[31;1m\nErro Interno! Contate o desenvolvedor. --params vazios!\e[m"
                 return $ERR_3X5X_EMPTY_PARAMS # Finaliza Script com erro
             fi
 
@@ -236,7 +252,7 @@ function _shut_parameterHelper_main {
                 fi
             done
         else
-            echo >&2 "Erro! Argumentos Inválidos!"
+            printf >&2 "\e[31;1m\nErro! Argumentos Inválidos!\e[m"
             return $ERR_3X5X_INVALID_ARGUMENTS # Finaliza Script com erro
         fi
     done
