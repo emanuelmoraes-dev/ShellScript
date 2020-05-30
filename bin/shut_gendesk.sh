@@ -184,7 +184,7 @@ function adapter {
 
 # Processa os parâmetros passados pelo usuário
 function parameters {
-    source $PARAMETER_HELPER --create-exists-array --flag-params -out --params -help -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
+    source $PARAMETER_HELPER --create-exists-array --flag-params -out -replace-file rf --params -help -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
 
     present_help=0
 
@@ -426,7 +426,7 @@ function run {
     fi
 
     if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"[Desktop Entry]\"")" ]; then
-        if [ -f "$dirname/$filename.desktop" ]; then
+        if [ "$present_replace_file" = 0 ] && [ -f "$dirname/$filename.desktop" ]; then
             desktop_entry="${desktop_entry}${endl}[Desktop Entry]"
         else
             desktop_entry="${desktop_entry}[Desktop Entry]"
@@ -509,6 +509,12 @@ function main {
             args=()
         fi
     done
+
+    # Verificando se script foi encerrado por --help
+
+    if [ "$present_help" = 1 ]; then
+    	return
+    fi
 
     # Verificando existência de argumentos obrigatórios
 
