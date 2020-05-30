@@ -408,12 +408,7 @@ function run {
         fi
     fi
 
-    local last_dirname=${#dirname}
-    let last_dirname=$last_dirname-1
-
-    if [ "${dirname:last_dirname:1}" = "/" ]; then
-        dirname="${dirname:0:last_dirname}"
-    fi
+    dirname="$(dirname "$dirname")/$(basename "$dirname")"
 
     if [ "$lang" ]; then
         lang="[$lang]"
