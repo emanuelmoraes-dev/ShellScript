@@ -1,5 +1,95 @@
 #!/bin/bash
 
+VERSION=1.0.0
+
+# Utilitário cujo objetivo é receber um conjunto de parâmetros
+# nomeados e separar os valores de seus parâmetros. Se usado com
+# o 'source', o resultado para cada parâmetro fica disponível na
+# variável 'shut_parameterHelper_args'
+#
+# Parâmetros:
+#     --help: Mostra todas as opções. Opcional"
+#     --version = Mostra a versão atual deste script. Opcional
+#     --index = Posição do parâmetro na qual será retornado seus
+#         valores. Valor padrão: 0
+#     --out = Exibe os valores do parâmetro da posição --index na
+#         saída padrão
+#     --exists = Lança erro se o parâmetro de --index não foi
+#         passado pelo usuário. Encerra a aplicação com sucesso
+#         caso o parâmetro foi passado. Opcional
+#     --sep = Separador utilizado para separar os vários elementos
+#         de uma lista de valores passados pelo usuário. Valor
+#         padrão: $'\n'
+#     --is-param = String na qual todos os parâmetros nomeados devem
+#         começar. Este parâmetro deve sempre vir antes do parâmetro
+#         --params. Valor padrão: -
+#     --params = Nomes dos parâmetros esperados para o usuário passar
+#         (ignorando o valor de --is-param, que por padrão é '-').
+#         Obrigatório
+#     --flag-params = Nomes dos parâmetros presentes em --params que
+#         não esperam nenhum valor. Um parâmetro marcado nesta opção
+#         pode ser inserido no meio dos valores de um outro parâmetro.
+#         Opcional
+#     --create-exists-array = Cria um array
+#         (shut_parameterHelper_exists) para informar se cada parâmetro
+#         de cada posição foi infomado pelo usuário (0 - não, 1 - sim)
+#     --no-strict = Impede o lançamento de erro por parâmetro
+#         desconhecido
+#     @@ = Informa que os argumentos começarão a ser analizados.
+#         Obrigatório
+#
+# Exemplo 1:
+#     source parameter-helper --sep + --params -v1 -nomes -idades @@ --idades "" 20 40 --nomes Emanuel Pedro
+#
+#     shut_util_array + "${shut_parameterHelper_args[2]}"
+#
+#     # Array de tamanho 3 com os valores '' '20' e '40'
+#     idades=("${shut_util_return[@]}")
+#
+# Exemplo 2:
+#     # Se o parâmetro --v1 foi passado
+#     if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then
+#
+#         source parameter-helper
+#
+#         shut_util_array $'\n' "`parameter-helper --out --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro`"
+#
+#         v1=("${shut_util_return[@]}") # Array com '1', '2' e '3'
+#     fi
+#
+# Exemplo 3:
+#     source parameter-helper --create-exists-array --params -v1 -nomes -idades @@ --idades 18 20 --nomes Emanuel Pedro
+#
+#     shut_util_array $'\n' "${shut_parameterHelper_args[0]}"
+#
+#     v1=("${shut_util_return[@]}") # Array vazio
+#
+#     # Se o parâmetro --nome foi passado
+#     if [ "${shut_parameterHelper_exists[1]}" = 1 ]; then
+#
+#         shut_util_array $'\n' "${shut_parameterHelper_args[1]}"
+#
+#         # Array com 'Emanuel' e 'Pedro'
+#         nome=("${shut_util_return[@]}")
+#     fi
+#
+# Exemplo 4: (Argumentos com string vazias são ignoradas nesta forma de uso)
+#     IFS=$'\n' # Define o separador do sistema
+#
+#     # Array de tamanho 2 com os valores '20' e '40'
+#     idades=(`parameter-helper --out --index 2 --params -v1 -nomes -idades @@ --idades \"\" 20 40 --nomes Emanuel Pedro`)
+#
+#     IFS=$'+' # Define o separador do sistema
+#
+#     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'
+#     nomes=(`parameter-helper --out --sep + --index 1 --params -v1 -nomes -idades @@ --idades "" 20 40 --nomes Emanuel Pedro`)
+#
+#     IFS=' ' # Volta ao separador padrão do sistema
+#
+# Autor: Emanuel Moraes de Almeida
+# Email: emanuelmoraes297@gmail.com
+# Github: https://github.com/emanuelmoraes-dev
+
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 SHUT_UTIL_NAME="shut-util"
 
@@ -22,6 +112,8 @@ function _shut_parameterHelper_helpout {
     echo "    variável 'shut_parameterHelper_args'"
     echo
     echo "    Parâmetros:"
+    echo "        --help: Mostra todas as opções. Opcional"
+    echo "        --version: Mostra a versão atual deste script"
     echo "        --index = Posição do parâmetro na qual será retornado seus"
     echo "            valores. Valor padrão: 0"
     echo "        --out = Exibe os valores do parâmetro da posição --index na"
@@ -126,8 +218,13 @@ shut_parameterHelper_exists=() # Array para informar se cada parâmetro de cada 
 function _shut_parameterHelper_main {
     _shut_parameterHelper_import || return $? # Importa utilitários
 
-    if [ "$1" = "--help" ]; then
+    if [ "$1" = "--help" ]; then # Se --help estiver presente no primeiro argumento
         _shut_parameterHelper_helpout || return $? # Executa função de ajuda na saída padrão
+        return 0                                   # Finaliza Script com Sucesso!
+    fi
+
+    if [ "$1" = "--version" ]; then # Se --version estiver presente no primeiro argumento
+        echo "version: $VERSION"                   # Exibe a versão do script
         return 0                                   # Finaliza Script com Sucesso!
     fi
 

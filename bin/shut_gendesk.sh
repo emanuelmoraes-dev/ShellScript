@@ -1,5 +1,93 @@
 #!/bin/bash
 
+VERSION=1.0.0
+
+# Script responsável por criar um lançador de aplicativo para uma aplicação
+# qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo
+# .desktop em /usr/share/applications. Caso contrário, cria-se o arquivo em
+# $HOME/.local/share/applications. Os parâmetros que iniciam por -- possuem
+# a maior prioridade. Os parâmetros que inicial por - possuem a segunda
+# maior prioridade
+#
+# Parâmetros Nomeados:
+#     --help: Mostra todas as opções. Opcional
+#     --version: Mostra a versão atual deste script
+#     --lang: Define a linguagem na qual o --name e o --comment devem ser
+#         exibidos. --lang APENAS será aplicado nos argumentos definidos
+#         APÓS este. Se não passado, a linguagem não será definida e os
+#         parâmetros --name e --comment se definirão como valor padrão.
+#         Opcional
+#     --name: Nome da aplicação a ser exibido no menu. Opcional
+#     --exec: Comando de execução da aplicação. Opcional (é altamente
+#         recomendado que flags, como o %f, não sejam inseridos aqui.
+#         Caso alguma flag seja necessária, insira ela no parâmetro
+#         --flag-exec)
+#     --flag-exec: Flags a serem inseridas ao final do conteúdo da chave
+#         'exec' do [Desktop Entry]. Opcional
+#     --icon: Caminho onde se encontra o ícone da aplicação. Opcional
+#     --categories: Lista de categorias separadas por espaço. Opcional
+#     --comment: Comentário sobre a aplicação. Opcional
+#     --filename: Nome do arquivo \".desktop\". Se não passado, usa-se o
+#         mesmo valor presente no parâmetro --name. Opcional
+#     --dirname: Diretório onde o arquivo .desktop será gerado. Se não
+#         Se não informado e o usuário for root, cria-se o arquivo em
+#         /usr/share/applications. Se o usuário não for root, cria-se
+#         o arquivo em $HOME/.local/share/applications.
+#         Opcional
+#     --out: Se esta flag for informada, nenhum arquivo será gerado e o
+#         conteúdo que seria gerado no arquivo é exibido na saída padrão.
+#         Opcional
+#     --replace-file: Se esta flag for informada e se já ouver um arquivo
+#         .desktop, tal arquivo será reescrito, ao invés de concatenado
+#
+# Atalhos:
+#     -n = --name
+#     -e = --exec
+#     -i = --icon
+#     -c = --categories
+#     -f = --filename
+#     -fe = --flag-exec
+#     -ct = --comment
+#     -d = --dirname
+#     -rf = --replace-file
+#
+# Parâmetros Posicionais:
+#     0: Equivalente ao parâmetro nomeado --name
+#     1: Equivalente ao parâmetro nomeado --exec
+#     2: Equivalente ao parâmetro nomeado --flag-exec
+#     3: Equivalente ao parâmetro nomeado --icon
+#     4: Equivalente ao parâmetro nomeado --categories
+#     6: Equivalente ao parâmetro nomeado --comment
+#     5: Equivalente ao parâmetro nomeado --filename
+#     7: Equivalente ao parâmetro nomeado --dirname
+#
+# Exemplos de Uso:
+#
+#     gendesk --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm --categories Development Java --filename eclipse --dirname /usr/share/applications --flag-exec %f --comment IDE para desenvolvedores Java
+#
+#     gendesk -n Eclipse -e ./eclipse/eclipse -i ./eclipse/icon.xpm -c Development Java -f eclipse -d /usr/share/applications -fe %f -ct IDE para desenvolvedores Java
+#
+#     gendesk Eclipse ./eclipse/eclipse %f ./eclipse/icon.xpm "Development Java" "IDE para desenvolvedores Java" eclipse /usr/share/applications
+#
+#     gendesk Eclipse ./eclipse/eclipse "" ./eclipse/icon.xpm "Development Java" "IDE para desenvolvedores Java"
+#
+#     gendesk --out --name Eclipse --exec ./eclipse/eclipse --icon ./eclipse/icon.xpm --categories Development Java --filename eclipse --dirname /usr/share/applications --flag-exec %f --lang en --comment IDE for Java developer --lang pt --comment IDE para desenvolvedores Java
+#
+#     gendesk -n Eclipse -e ./eclipse/eclipse -i ./eclipse/icon.xpm -c Development Java -f eclipse -d /usr/share/applications -fe %f -ct IDE for Java developer --lang pt -ct IDE para desenvolvedores Java
+#
+#     gendesk Eclipse ./eclipse/eclipse "" ./eclipse/icon.xpm "Development Java" "IDE for Java developer" --lang pt -ct IDE para desenvolvedores Java
+#
+#     gendesk --lang pt Eclipse ./eclipse/eclipse "" ./eclipse/icon.xpm "Development Java" "IDE para desenvolvedores Java"
+#
+# É possível misturar parâmetros nomeados com parâmetros posicionais. Neste
+# caso os parâmetros nomeados sempre terão preferência, sobrescrevendo os
+# posicionais. Os parâmetros posicionais não sobrescrevem eles próprios,
+# acumulando os valores caso eles seja duplicados
+#
+# Autor: Emanuel Moraes de Almeida
+# Email: emanuelmoraes297@gmail.com
+# Github: https://github.com/emanuelmoraes-dev
+
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 PARAMETER_HELPER_NAME="parameter-helper"
 
@@ -24,13 +112,15 @@ ERROR_THEME="$RED"
 function helpout {
     echo
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
-    echo "    qualquer no menu do sistema. Caso contrário, cria-se o arquivo em"
-    echo "    $HOME/.local/share/applications. Os parâmetros que iniciam por --"
-    echo "    possuem a maior prioridade. Os parâmetros que inicial por - possuem"
-    echo "    a segunda maior prioridade"
+    echo "    qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo"
+    echo "    .desktop em /usr/share/applications. Caso contrário, cria-se o arquivo em"
+    echo "    $HOME/.local/share/applications. Os parâmetros que iniciam por -- possuem"
+    echo "    a maior prioridade. Os parâmetros que inicial por - possuem a segunda"
+    echo "    maior prioridade"
     echo
     echo "    Parâmetros Nomeados:"
     echo "        --help: Mostra todas as opções. Opcional"
+    echo "        --version: Mostra a versão atual deste script"
     echo "        --lang: Define a linguagem na qual o --name e o --comment devem ser"
     echo "            exibidos. --lang APENAS será aplicado nos argumentos definidos"
     echo "            APÓS este. Se não passado, a linguagem não será definida e os"
@@ -184,45 +274,81 @@ function adapter {
 
 # Processa os parâmetros passados pelo usuário
 function parameters {
-    source $PARAMETER_HELPER --create-exists-array --flag-params -out -replace-file rf --params -help -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
+    source $PARAMETER_HELPER --create-exists-array --flag-params -out -replace-file rf --params -help -version -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
+
+    # Mapeando posições de parâmetros
+
+    __HELP__=0
+    __VERSION__=1
+    __LANG__=2
+    __DEFAULT__=3
+    __NAME__=4
+    __EXEC__=5
+    __ICON__=6
+    __CATEGORIES__=7
+    __FILENAME__=8
+    __FLAG_EXEC__=9
+    __COMMENT__=10
+    __DIRNAME__=11
+    __OUT__=12
+    __REPLACE_FILE__=13
+    _N_=14
+    _E_=15
+    _I_=16
+    _C_=17
+    _F_=18
+    _FE_=19
+    _CT_=20
+    _D_=21
+    _RF_=22
+
+    # Verificando presença de --help
 
     present_help=0
 
-    if [ "${shut_parameterHelper_exists[0]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__HELP__]}" = 1 ]; then
         present_help=1
+    fi
+
+    # Verificando presença de --version
+
+    present_version=0
+
+    if [ "${shut_parameterHelper_exists[__VERSION__]}" = 1 ]; then
+        present_version=1
     fi
 
     # Atribuindo o valor de lang
 
-    lang="${shut_parameterHelper_args[1]}"
+    lang="${shut_parameterHelper_args[__LANG__]}"
 
     # Arrays dos parâmetros nomeados
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[2]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__DEFAULT__]}" || return $?
     args_default=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[3]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__NAME__]}" || return $?
     args_name=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[4]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__EXEC__]}" || return $?
     args_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[5]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__ICON__]}" || return $?
     args_icon=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[6]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__CATEGORIES__]}" || return $?
     args_categories=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[7]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__FILENAME__]}" || return $?
     args_filename=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[8]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__FLAG_EXEC__]}" || return $?
     args_flag_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[9]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__COMMENT__]}" || return $?
     args_comment=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[10]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[__DIRNAME__]}" || return $?
     args_dirname=("${shut_util_return[@]}")
 
     # Verificando se argumento --out está presente
@@ -231,7 +357,7 @@ function parameters {
         present_out=0
     fi
 
-    if [ "${shut_parameterHelper_exists[11]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__OUT__]}" = 1 ]; then
         present_out=1
     fi
 
@@ -241,39 +367,39 @@ function parameters {
         present_replace_file=0
     fi
 
-    if [ "${shut_parameterHelper_exists[12]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__REPLACE_FILE__]}" = 1 ]; then
         present_replace_file=1
     fi
 
     # Arrays dos parâmetros de atalho
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[13]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_N_]}" || return $?
     args_shortcut_name=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[14]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_E_]}" || return $?
     args_shortcut_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[15]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_I_]}" || return $?
     args_shortcut_icon=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[16]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_C_]}" || return $?
     args_shortcut_categories=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[17]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_F_]}" || return $?
     args_shortcut_filename=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[18]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_FE_]}" || return $?
     args_shortcut_flag_exec=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[19]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_CT_]}" || return $?
     args_shortcut_comment=("${shut_util_return[@]}")
 
-    shut_util_array $'\n' "${shut_parameterHelper_args[20]}" || return $?
+    shut_util_array $'\n' "${shut_parameterHelper_args[_D_]}" || return $?
     args_shortcut_dirname=("${shut_util_return[@]}")
 
     # Verificando se argumento -rf está presente
 
-    if [ "${shut_parameterHelper_exists[21]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_RF_]}" = 1 ]; then
         present_replace_file=1
     fi
 
@@ -302,69 +428,69 @@ function parameters {
 
     # Atribui (se existir) os parâmetros de atalho
 
-    if [ "${shut_parameterHelper_exists[12]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_N_]}" = 1 ]; then
         name="${args_shortcut_name[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[13]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_E_]}" = 1 ]; then
         exec="${args_shortcut_exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[14]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_I_]}" = 1 ]; then
         icon="${args_shortcut_icon[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[15]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_C_]}" = 1 ]; then
         categories="$(shut_util_join \; ${args_shortcut_categories[@]})" || return $?
     fi
 
-    if [ "${shut_parameterHelper_exists[16]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_F_]}" = 1 ]; then
         filename="${args_shortcut_filename[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[17]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_FE_]}" = 1 ]; then
         flag_exec="${args_shortcut_flag_exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[18]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_CT_]}" = 1 ]; then
         comment="${args_shortcut_comment[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[19]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[_D_]}" = 1 ]; then
         dirname="${args_shortcut_dirname}"
     fi
 
     # Atribui (se existir) os parâmetros nomeados
 
-    if [ "${shut_parameterHelper_exists[3]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__NAME__]}" = 1 ]; then
         name="${args_name[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[4]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__EXEC__]}" = 1 ]; then
         exec="${args_exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[5]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__ICON__]}" = 1 ]; then
         icon="${args_icon[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[6]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__CATEGORIES__]}" = 1 ]; then
         categories="$(shut_util_join \; ${args_categories[@]})" || return $?
     fi
 
-    if [ "${shut_parameterHelper_exists[7]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__FILENAME__]}" = 1 ]; then
         filename="${args_filename[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[8]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__FLAG_EXEC__]}" = 1 ]; then
         flag_exec="${args_flag_exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[9]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__COMMENT__]}" = 1 ]; then
         comment="${args_comment[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[10]}" = 1 ]; then
+    if [ "${shut_parameterHelper_exists[__DIRNAME__]}" = 1 ]; then
         dirname="${args_dirname[@]}"
     fi
 }
@@ -377,6 +503,11 @@ function run {
 
     if [ "$present_help" = 1 ]; then
         helpout autor || return $?
+        return 0
+    fi
+
+    if [ "$present_version" = 1 ]; then
+        echo "version: $VERSION"
         return 0
     fi
 
@@ -507,7 +638,7 @@ function main {
 
     # Verificando se script foi encerrado por --help
 
-    if [ "$present_help" = 1 ]; then
+    if [ "$present_help" = 1 ] || [ "$present_version" = 1 ]; then
     	return
     fi
 
