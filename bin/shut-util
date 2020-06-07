@@ -95,7 +95,7 @@ function shut_util_array {
         fi
     done
 
-    declare -g -a $array_name=("${shut_util_return[@]}")
+    eval $array_name='("${shut_util_return[@]}")'
 }
 
 # Retorna na saída padrão o index da primeira

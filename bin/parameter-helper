@@ -69,7 +69,7 @@ VERSION=2.0.0
 #     echo "${__v1[@]}" # Ecoa array vazio do parâmetro v1
 #
 #     if [ "$__nomes_exists" = 1 ]; then # Se o parâmetro --nomes foi passado
-#         echo "${__nomes}" # Este código não seria executado
+#         echo "${__nomes[@]}" # Este código não seria executado
 #     fi
 #
 #     if [ "$_idades_exists" = 1 ]; then # Se o parâmetro -idades foi passado
@@ -102,13 +102,13 @@ VERSION=2.0.0
 #
 #     echo "${v1[@]}" # Ecoa array vazio
 #
-#     # Se o parâmetro --nome foi passado
+#     # Se o parâmetro --nomes foi passado
 #     if [ "${exists[1]}" = 1 ]; then
 #
-#         shut_util_array nome + "${args[1]}"
+#         shut_util_array nomes + "${args[1]}"
 #
 #         # Ecoa Array com 'Emanuel' e 'Pedro'
-#         echo "${nome[@]}"
+#         echo "${nomes[@]}"
 #     fi
 #
 # Exemplo 5:
@@ -118,25 +118,25 @@ VERSION=2.0.0
 #
 #     echo "${v1[@]}" # Ecoa array vazio
 #
-#     # Se o parâmetro --nome foi passado
+#     # Se o parâmetro --nomes foi passado
 #     if [ "${shut_parameterHelper_exists[1]}" = 1 ]; then
 #
-#         shut_util_array nome + "${shut_parameterHelper_args[1]}"
+#         shut_util_array nomes + "${shut_parameterHelper_args[1]}"
 #
 #         # Ecoa Array com 'Emanuel' e 'Pedro'
-#         echo "${nome[@]}"
+#         echo "${nomes[@]}"
 #     fi
 #
 # Exemplo 6: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
-#     IFS=$'\n' # Define o separador do sistema
-#
-#     # Array de tamanho 2 com os valores '20' e '40'
-#     idades=($(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades \"\" 20 40 --nomes Emanuel Pedro))
-#
 #     IFS=$'+' # Define o separador do sistema
 #
 #     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'
-#     nomes=($(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades "" 20 40 --nomes Emanuel Pedro))
+#     nomes=($(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro))
+#
+#     IFS=$'\n' # Define o separador do sistema
+#
+#     # Array de tamanho 2 com os valores '20' e '40' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)
+#     idades=($(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro))
 #
 #     IFS=' ' # Volta ao separador padrão do sistema
 #
@@ -226,7 +226,7 @@ function _shut_parameterHelper_helpout {
     echo "        echo \"\${__v1[@]}\" # Ecoa array vazio do parâmetro v1"
     echo
     echo "        if [ \"\$__nomes_exists\" = 1 ]; then # Se o parâmetro --nomes foi passado"
-    echo "            echo \"\${__nomes}\" # Este código não seria executado"
+    echo "            echo \"\${__nomes[@]}\" # Este código não seria executado"
     echo "        fi"
     echo
     echo "        if [ \"\$_idades_exists\" = 1 ]; then # Se o parâmetro -idades foi passado"
@@ -259,13 +259,13 @@ function _shut_parameterHelper_helpout {
     echo
     echo "        echo \"\${v1[@]}\" # Ecoa array vazio"
     echo
-    echo "        # Se o parâmetro --nome foi passado"
+    echo "        # Se o parâmetro --nomes foi passado"
     echo "        if [ \"\${exists[1]}\" = 1 ]; then"
     echo
-    echo "            shut_util_array nome + \"\${args[1]}\""
+    echo "            shut_util_array nomes + \"\${args[1]}\""
     echo
     echo "            # Ecoa Array com 'Emanuel' e 'Pedro'"
-    echo "            echo \"\${nome[@]}\""
+    echo "            echo \"\${nomes[@]}\""
     echo "        fi"
     echo
     echo "    Exemplo 5:"
@@ -275,25 +275,25 @@ function _shut_parameterHelper_helpout {
     echo
     echo "        echo \"\${v1[@]}\" # Ecoa array vazio"
     echo
-    echo "        # Se o parâmetro --nome foi passado"
+    echo "        # Se o parâmetro --nomes foi passado"
     echo "        if [ \"\${shut_parameterHelper_exists[1]}\" = 1 ]; then"
     echo
-    echo "            shut_util_array nome + \"\${shut_parameterHelper_args[1]}\""
+    echo "            shut_util_array nomes + \"\${shut_parameterHelper_args[1]}\""
     echo
     echo "            # Ecoa Array com 'Emanuel' e 'Pedro'"
-    echo "            echo \"\${nome[@]}\""
+    echo "            echo \"\${nomes[@]}\""
     echo "        fi"
     echo
     echo "    Exemplo 6: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
+    echo "        IFS=\$'+' # Define o separador do sistema"
+    echo
+    echo "        # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)"
+    echo "        nomes=(\$(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro))"
+    echo
     echo "        IFS=\$'\n' # Define o separador do sistema"
     echo
     echo "        # Array de tamanho 2 com os valores '20' e '40'"
-    echo "        idades=(\$(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades \"\" 20 40 --nomes Emanuel Pedro))"
-    echo
-    echo "        IFS=\$'+' # Define o separador do sistema"
-    echo
-    echo "        # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'"
-    echo "        nomes=(\$(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades "" 20 40 --nomes Emanuel Pedro))"
+    echo "        idades=(\$(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro))"
     echo
     echo "        IFS=' ' # Volta ao separador padrão do sistema"
     echo
@@ -404,14 +404,6 @@ function _shut_parameterHelper_main {
                 is_param=""
             elif [ "$a" = "@@" ]; then
                 start_args=1
-
-                if [ "$present_create_array_args" = 1 ]; then
-                    declare -g -a $array_args
-                fi
-
-                if [ "$present_create_array_exists" = 1 ]; then
-                    declare -g -a $array_exists
-                fi
             fi
 
         elif [ "$start_args" = 0 ] && [ "$param" = "--index" ]; then
@@ -504,7 +496,7 @@ function _shut_parameterHelper_main {
         shut_util_contains "${params[index]}" "${used_params[@]}"
     else
         if [ "$present_create_array_args" = 1 ]; then
-            declare -g -a $array_args=("${_shut_parameterHelper_args[@]}")
+            eval $array_args='("${_shut_parameterHelper_args[@]}")'
         fi
 
         if [ "$present_create_array_exists" = 1 ]; then
@@ -516,7 +508,7 @@ function _shut_parameterHelper_main {
                 fi
             done
 
-            declare -g -a $array_exists=("${_shut_parameterHelper_exists[@]}")
+            eval $array_exists='("${_shut_parameterHelper_exists[@]}")'
         fi
 
         if [ "$present_create_global_args" = 1 ]; then
@@ -531,9 +523,9 @@ function _shut_parameterHelper_main {
                 global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")_exists"
 
                 if shut_util_contains "${params[i]}" "${used_params[@]}"; then
-                    declare -g $global_variable_name=1
+                    eval $global_variable_name=1
                 else
-                    declare -g $global_variable_name=0
+                    eval $global_variable_name=0
                 fi
             done
         fi
