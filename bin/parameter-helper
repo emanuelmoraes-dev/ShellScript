@@ -311,7 +311,7 @@ function _shut_parameterHelper_import {
         if type -P "$SHUT_UTIL_NAME" 1>/dev/null 2>/dev/null; then
             UTIL="$SHUT_UTIL_NAME"
         else
-            printf >&2 "\e[31;1m\nErro! \"$SHUT_UTIL_NAME\" não encontrado!\e[m"
+            printf >&2 "\e[31;1m\nErro! \"$SHUT_UTIL_NAME\" não encontrado!\e[m\n"
             return $ERR_3X5X_NOT_FOUND_SHUT_UTIL
         fi
     fi
@@ -356,7 +356,7 @@ function _shut_parameterHelper_main {
     local len_flag_params=0                          # Quantidade de parâmetros já marcados como flag
 
     if [ "$#" = 0 ]; then
-        printf >&2 "\e[31;1m\nErro! Argumentos não definidos!\e[m"
+        printf >&2 "\e[31;1m\nErro! Argumentos não definidos!\e[m\n"
         return $ERR_3X5X_EMPTY_ARGS
     fi
 
@@ -464,7 +464,7 @@ function _shut_parameterHelper_main {
                 used_params[$len_used_params]="$param" # Adiciona no final do array o parâmetro
                 empty_param=1                          # Informa que o parâmetro atual ainda não possui valores
             elif [ "$present_no_strict" = "0" ]; then
-                printf >&2 "\e[31;1m\nErro! Parâmetro $a inválido!\e[m"
+                printf >&2 "\e[31;1m\nErro! Parâmetro $a inválido!\e[m\n"
                 return $ERR_3X5X_INVALID_PARAMETER # Finaliza Script com erro
             fi
 
@@ -474,7 +474,7 @@ function _shut_parameterHelper_main {
             fi
 
             if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
-                printf >&2 "\e[31;1m\nErro Interno! Contate o desenvolvedor. --params vazios!\e[m"
+                printf >&2 "\e[31;1m\nErro Interno! Contate o desenvolvedor. --params vazios!\e[m\n"
                 return $ERR_3X5X_EMPTY_PARAMS # Finaliza Script com erro
             fi
 
@@ -493,7 +493,7 @@ function _shut_parameterHelper_main {
                 fi
             done
         else
-            printf >&2 "\e[31;1m\nErro! Argumentos Inválidos!\e[m"
+            printf >&2 "\e[31;1m\nErro! Argumentos Inválidos!\e[m\n"
             return $ERR_3X5X_INVALID_ARGUMENTS # Finaliza Script com erro
         fi
     done
