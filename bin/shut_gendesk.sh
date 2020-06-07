@@ -1,7 +1,9 @@
 #!/bin/bash
 
-VERSION=1.0.0
+VERSION=2.0.0
 
+# gendesk@2.0.0
+#
 # Script responsável por criar um lançador de aplicativo para uma aplicação
 # qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo
 # .desktop em /usr/share/applications. Caso contrário, cria-se o arquivo em
@@ -101,6 +103,8 @@ ERR_6X8X_NOT_FOUND_EXEC=63
 ERR_6X8X_EMPTY_ARGUMENTS=71
 ERR_6X8X_EMPTY_NAME_ARG=72
 ERR_6X8X_EMPTY_EXEC_ARG=73
+## INVALID (8x)
+ERR_6X8X_INVALID_ARGUMENTS=81
 
 # CORES
 RED="\e[31;1m"
@@ -110,6 +114,7 @@ END_COLOR="\e[m"
 ERROR_THEME="$RED"
 
 function helpout {
+    echo "    gendesk@$VERSION"
     echo
     echo "    Script responsável por criar um lançador de aplicativo para uma aplicação"
     echo "    qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo"
@@ -274,39 +279,13 @@ function adapter {
 
 # Processa os parâmetros passados pelo usuário
 function parameters {
-    source $PARAMETER_HELPER --create-exists-array --flag-params -out -replace-file rf --params -help -version -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" helperr -v)
-
-    # Mapeando posições de parâmetros
-
-    __HELP__=0
-    __VERSION__=1
-    __LANG__=2
-    __DEFAULT__=3
-    __NAME__=4
-    __EXEC__=5
-    __ICON__=6
-    __CATEGORIES__=7
-    __FILENAME__=8
-    __FLAG_EXEC__=9
-    __COMMENT__=10
-    __DIRNAME__=11
-    __OUT__=12
-    __REPLACE_FILE__=13
-    _N_=14
-    _E_=15
-    _I_=16
-    _C_=17
-    _F_=18
-    _FE_=19
-    _CT_=20
-    _D_=21
-    _RF_=22
+    source $PARAMETER_HELPER --create-global-args --create-global-exists --flag-params -out -replace-file rf --params -help -version -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" e=$ERR_6X8X_INVALID_ARGUMENTS helperr -v)
 
     # Verificando presença de --help
 
     present_help=0
 
-    if [ "${shut_parameterHelper_exists[__HELP__]}" = 1 ]; then
+    if [ "${__help_exists}" = 1 ]; then
         present_help=1
     fi
 
@@ -314,42 +293,13 @@ function parameters {
 
     present_version=0
 
-    if [ "${shut_parameterHelper_exists[__VERSION__]}" = 1 ]; then
+    if [ "${__version_exists}" = 1 ]; then
         present_version=1
     fi
 
     # Atribuindo o valor de lang
 
-    lang="${shut_parameterHelper_args[__LANG__]}"
-
-    # Arrays dos parâmetros nomeados
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__DEFAULT__]}" || return $?
-    args_default=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__NAME__]}" || return $?
-    args_name=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__EXEC__]}" || return $?
-    args_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__ICON__]}" || return $?
-    args_icon=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__CATEGORIES__]}" || return $?
-    args_categories=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__FILENAME__]}" || return $?
-    args_filename=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__FLAG_EXEC__]}" || return $?
-    args_flag_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__COMMENT__]}" || return $?
-    args_comment=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[__DIRNAME__]}" || return $?
-    args_dirname=("${shut_util_return[@]}")
+    lang="$__lang"
 
     # Verificando se argumento --out está presente
 
@@ -357,7 +307,7 @@ function parameters {
         present_out=0
     fi
 
-    if [ "${shut_parameterHelper_exists[__OUT__]}" = 1 ]; then
+    if [ "${__out_exists}" = 1 ]; then
         present_out=1
     fi
 
@@ -367,131 +317,105 @@ function parameters {
         present_replace_file=0
     fi
 
-    if [ "${shut_parameterHelper_exists[__REPLACE_FILE__]}" = 1 ]; then
+    if [ "${__replace_file_exists}" = 1 ]; then
         present_replace_file=1
     fi
 
-    # Arrays dos parâmetros de atalho
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_N_]}" || return $?
-    args_shortcut_name=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_E_]}" || return $?
-    args_shortcut_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_I_]}" || return $?
-    args_shortcut_icon=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_C_]}" || return $?
-    args_shortcut_categories=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_F_]}" || return $?
-    args_shortcut_filename=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_FE_]}" || return $?
-    args_shortcut_flag_exec=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_CT_]}" || return $?
-    args_shortcut_comment=("${shut_util_return[@]}")
-
-    shut_util_array $'\n' "${shut_parameterHelper_args[_D_]}" || return $?
-    args_shortcut_dirname=("${shut_util_return[@]}")
-
     # Verificando se argumento -rf está presente
 
-    if [ "${shut_parameterHelper_exists[_RF_]}" = 1 ]; then
+    if [ "${_rf_exists}" = 1 ]; then
         present_replace_file=1
     fi
 
     # Atribui os valores de --default
 
-    if [ "${args_default[0]}" ]; then
-        name="${args_default[0]}"
+    if [ "${__default[0]}" ]; then
+        name="${__default[0]}"
     fi
 
-    exec="${args_default[1]}"
-    flag_exec="${args_default[2]}"
-    icon="${args_default[3]}"
-    categories="$(shut_util_join \; ${args_default[4]})" || return $?
+    exec="${__default[1]}"
+    flag_exec="${__default[2]}"
+    icon="${__default[3]}"
+    categories="$(shut_util_join \; ${__default[4]})" || return $?
 
-    if [ "${args_default[5]}" ]; then
-        comment="${args_default[5]}"
+    if [ "${__default[5]}" ]; then
+        comment="${__default[5]}"
     fi
 
-    if [ "${args_default[6]}" ]; then
-        filename="${args_default[6]}"
+    if [ "${__default[6]}" ]; then
+        filename="${__default[6]}"
     fi
 
-    if [ "${args_default[7]}" ]; then
-        dirname="${args_default[7]}"
+    if [ "${__default[7]}" ]; then
+        dirname="${__default[7]}"
     fi
 
     # Atribui (se existir) os parâmetros de atalho
 
-    if [ "${shut_parameterHelper_exists[_N_]}" = 1 ]; then
-        name="${args_shortcut_name[@]}"
+    if [ "${_n_exists}" = 1 ]; then
+        name="${_n[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_E_]}" = 1 ]; then
-        exec="${args_shortcut_exec[@]}"
+    if [ "${_e_exists}" = 1 ]; then
+        exec="${_e[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_I_]}" = 1 ]; then
-        icon="${args_shortcut_icon[@]}"
+    if [ "${_i_exists}" = 1 ]; then
+        icon="${_i[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_C_]}" = 1 ]; then
-        categories="$(shut_util_join \; ${args_shortcut_categories[@]})" || return $?
+    if [ "${_c_exists}" = 1 ]; then
+        categories="$(shut_util_join \; ${_c[@]})" || return $?
     fi
 
-    if [ "${shut_parameterHelper_exists[_F_]}" = 1 ]; then
-        filename="${args_shortcut_filename[@]}"
+    if [ "${_f_exists}" = 1 ]; then
+        filename="${_f[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_FE_]}" = 1 ]; then
-        flag_exec="${args_shortcut_flag_exec[@]}"
+    if [ "${_fe_exists}" = 1 ]; then
+        flag_exec="${_fe[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_CT_]}" = 1 ]; then
-        comment="${args_shortcut_comment[@]}"
+    if [ "${_ct_exists}" = 1 ]; then
+        comment="${_ct[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[_D_]}" = 1 ]; then
-        dirname="${args_shortcut_dirname}"
+    if [ "${_d_exists}" = 1 ]; then
+        dirname="${_d}"
     fi
 
     # Atribui (se existir) os parâmetros nomeados
 
-    if [ "${shut_parameterHelper_exists[__NAME__]}" = 1 ]; then
-        name="${args_name[@]}"
+    if [ "${__name_exists}" = 1 ]; then
+        name="${__name[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__EXEC__]}" = 1 ]; then
-        exec="${args_exec[@]}"
+    if [ "${__exec_exists}" = 1 ]; then
+        exec="${__exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__ICON__]}" = 1 ]; then
-        icon="${args_icon[@]}"
+    if [ "${__icon_exists}" = 1 ]; then
+        icon="${__icon[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__CATEGORIES__]}" = 1 ]; then
-        categories="$(shut_util_join \; ${args_categories[@]})" || return $?
+    if [ "${__categories_exists}" = 1 ]; then
+        categories="$(shut_util_join \; ${__categories[@]})" || return $?
     fi
 
-    if [ "${shut_parameterHelper_exists[__FILENAME__]}" = 1 ]; then
-        filename="${args_filename[@]}"
+    if [ "${__filename_exists}" = 1 ]; then
+        filename="${__filename[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__FLAG_EXEC__]}" = 1 ]; then
-        flag_exec="${args_flag_exec[@]}"
+    if [ "${__flag_exec_exists}" = 1 ]; then
+        flag_exec="${__flag_exec[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__COMMENT__]}" = 1 ]; then
-        comment="${args_comment[@]}"
+    if [ "${__comment_exists}" = 1 ]; then
+        comment="${__comment[@]}"
     fi
 
-    if [ "${shut_parameterHelper_exists[__DIRNAME__]}" = 1 ]; then
-        dirname="${args_dirname[@]}"
+    if [ "${__dirname_exists}" = 1 ]; then
+        dirname="${__dirname[@]}"
     fi
 }
 
