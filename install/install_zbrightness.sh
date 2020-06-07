@@ -164,7 +164,7 @@ function helperr {
 
 # Ecoa na saída padrão a lib para processar os parâmetros nomeados
 function get_parameter_helper {
-    local PARAMETER_HELPER="$DIRNAME/../bin/shut_parameterHelper.sh"
+    local PARAMETER_HELPER="$DIRNAME/../bin/parameter-helper"
 
     if ! [ -f "$PARAMETER_HELPER" ]; then
         if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
@@ -179,7 +179,7 @@ function get_parameter_helper {
 
 # Ecoa na saída padrão a lib para gerar lançador de aplicativo
 function get_gendesk {
-    local GENDESK="$DIRNAME/../bin/shut_gendesk.sh"
+    local GENDESK="$DIRNAME/../bin/gendesk"
 
     if ! [ -f "$GENDESK" ]; then
         if type -P "$GENDESK_NAME" 1>/dev/null 2>/dev/null; then

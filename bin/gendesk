@@ -244,7 +244,7 @@ function helperr {
 # argumentos passados pelo usuário
 function get_parameter_helper {
     local DIRNAME="$(dirname "$0")"
-    PARAMETER_HELPER="$DIRNAME/shut_parameterHelper.sh"
+    PARAMETER_HELPER="$DIRNAME/parameter-helper"
 
     if ! [ -f "$PARAMETER_HELPER" ]; then
         if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
