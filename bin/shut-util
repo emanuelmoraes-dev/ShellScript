@@ -79,6 +79,7 @@ function shut_util_array {
 
     local ch
     local sub
+    local i
     for ((i = 0; i < len_args; i++)); do
         ch="${args:i:1}"
         sub="${args:i:len_sep}"
@@ -98,9 +99,9 @@ function shut_util_array {
     eval $array_name='("${shut_util_return[@]}")'
 }
 
-# Retorna na saída padrão o index da primeira
+# Ecoa na saída padrão o index da primeira
 # ocorrência de uma determinada string em um
-# array
+# array. Se não existir, ecoa-se -1
 #
 # shut_util_findex "<string>" "${array[@]}"
 function shut_util_findex {
@@ -184,15 +185,16 @@ function shut_util_is_letter {
 }
 
 # Ecoa na saída padrão uma string substituindo todos
-# os caracteres de uma string que são letras por
+# os caracteres da string que são letras por
 # underline
 #
 # Parâmetro: String a ter os caracteres  convertidos
 function shut_util_adapter_to_variable_name {
     local target="$@"
     local len_target="${#target}"
-    local rt=""
-    local ch=""
+    local rt
+    local ch
+    local i
     for ((i = 0; i < len_target; i++)); do
         ch="${target:i:1}"
 

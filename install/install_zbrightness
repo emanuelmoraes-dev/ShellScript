@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRNAME="$(dirname "$0")"
+DIRNAME="$(pwd)"
 
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 PARAMETER_HELPER_NAME="parameter-helper"
@@ -16,16 +16,16 @@ if [ $(echo $LANG | cut -b1-2) = "pt" ]; then
 fi
 
 # CÓDIGOS DE ERRO DE SISTEMA (1-29)
-ERR_9X11X_NOT_ADMIN=1
+ERR_NOT_ADMIN=1
 
 # CÓDIGOS DE ERRO DO SCRIPT (90-119)
-ERR_9X11X_UNEXPECTED=90
+ERR_UNEXPECTED=90
 ## NOT FOUND (9X)
-ERR_9X11X_NOT_FOUND_PARAMETER_HELPER=91
-ERR_9X11X_NOT_FOUND_GENDESK=92
-ERR_9X11X_NOT_FOUND_ZENITY=93
+ERR_NOT_FOUND_PARAMETER_HELPER=91
+ERR_NOT_FOUND_GENDESK=92
+ERR_NOT_FOUND_ZENITY=93
 ## INVALID (10X)
-ERR_9X11X_INVALID_BACKLIGHT_FILE=101
+ERR_INVALID_BACKLIGHT_FILE=101
 
 # CORES
 RED="\e[31;1m"
@@ -141,7 +141,7 @@ function helperr {
     local err="$?"
 
     if [ -z "$err" ] || [ "$err" = "0" ]; then
-        err=$ERR_9X11X_UNEXPECTED
+        err=$ERR_UNEXPECTED
     fi
 
     if [ "$e" ]; then
@@ -170,7 +170,7 @@ function get_parameter_helper {
         if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
             PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
         else
-            return $(m="Erro! \"$PARAMETER_HELPER_NAME\" não encontrado!" e=$ERR_9X11X_NOT_FOUND_PARAMETER_HELPER helperr)
+            return $(m="Erro! \"$PARAMETER_HELPER_NAME\" não encontrado!" e=$ERR_NOT_FOUND_PARAMETER_HELPER helperr)
         fi
     fi
 
@@ -185,7 +185,7 @@ function get_gendesk {
         if type -P "$GENDESK_NAME" 1>/dev/null 2>/dev/null; then
             GENDESK="$GENDESK_NAME"
         else
-            return $(m="Erro! \"$GENDESK_NAME\" não encontrado!" e=$ERR_9X11X_NOT_FOUND_GENDESK helperr)
+            return $(m="Erro! \"$GENDESK_NAME\" não encontrado!" e=$ERR_NOT_FOUND_GENDESK helperr)
         fi
     fi
 
@@ -197,7 +197,7 @@ function parameters {
     local PARAMETER_HELPER="$(get_parameter_helper)" || return $?
     GENDESK="$(get_gendesk)" || return $?
 
-    source $PARAMETER_HELPER --create-exists-array --params -help -unsafe -enable-unsafe -start-unsafe -gui -desktop-entry -cli -backlight-file -min -max -binary-name -config-file -service-name -name -exec -icon -categories -filename -flag-exec -comment G gksu beesu U C M m b n e i c f fe ct @@ "$@" || return $(m="Erro! Argumentos inválidos!" helperr -v)
+    source $PARAMETER_HELPER --create-array-exists --params -help -unsafe -enable-unsafe -start-unsafe -gui -desktop-entry -cli -backlight-file -min -max -binary-name -config-file -service-name -name -exec -icon -categories -filename -flag-exec -comment G gksu beesu U C M m b n e i c f fe ct @@ "$@" || return $(m="Erro! Argumentos inválidos!" helperr -v)
 
     # Flags sobre os parâmetros
 
@@ -435,18 +435,18 @@ function config {
     fi
 
     if [ "$present_unsafe" = 1 ] && [ "$(id -u)" != "0" ]; then
-        return $(m="Erro! É necessário permissão administrativa para habilitar o\n  modo inseguro" e=$ERR_9X11X_NOT_ADMIN heperr)
+        return $(m="Erro! É necessário permissão administrativa para habilitar o\n  modo inseguro" e=$ERR_NOT_ADMIN heperr)
     fi
 
     if [ "$present_gui" = 1 ] && ! type -P zenity 1>/dev/null 2>/dev/null; then
-        return $(m="Erro: dependência \"zenity\" não encontrada!\n  Por favor instale a dependência \"zenity\"" e=$ERR_9X11X_NOT_FOUND_ZENITY heperr)
+        return $(m="Erro: dependência \"zenity\" não encontrada!\n  Por favor instale a dependência \"zenity\"" e=$ERR_NOT_FOUND_ZENITY heperr)
     fi
 
     if [ "$present_backlight_file" = 0 ]; then
         # Obtém (pelo usuário) o caminho do arquivo responsável pela iluminação da tela
         input_backlight_file || return $?
     elif ! [ -f "$backlight_file_param" ]; then
-        return $(m="Valor de --backlight-file inválido!" e=$ERR_9X11X_INVALID_BACKLIGHT_FILE helperr)
+        return $(m="Valor de --backlight-file inválido!" e=$ERR_INVALID_BACKLIGHT_FILE helperr)
     fi
 
     # Obtém o nome da pasta contendo o arquivo responsável pela iluminação da tela

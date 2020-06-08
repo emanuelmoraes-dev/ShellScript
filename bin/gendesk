@@ -94,17 +94,15 @@ VERSION=2.0.0
 PARAMETER_HELPER_NAME="parameter-helper"
 
 # CÓDIGOS DE ERRO DO SCRIPT (60-89)
-ERR_6X8X_UNEXPECTED=60
+ERR_UNEXPECTED=60
 ## NOT FOUND (6X)
-ERR_6X8X_NOT_FOUND_PARAMETER_HELPER=61
-ERR_6X8X_NOT_FOUND_NAME=62
-ERR_6X8X_NOT_FOUND_EXEC=63
+ERR_NOT_FOUND_PARAMETER_HELPER=61
+ERR_NOT_FOUND_NAME=62
+ERR_NOT_FOUND_EXEC=63
 ## EMPTY (7X)
-ERR_6X8X_EMPTY_ARGUMENTS=71
-ERR_6X8X_EMPTY_NAME_ARG=72
-ERR_6X8X_EMPTY_EXEC_ARG=73
+ERR_EMPTY_ARGUMENTS=71
 ## INVALID (8x)
-ERR_6X8X_INVALID_ARGUMENTS=81
+ERR_INVALID_ARGUMENTS=81
 
 # CORES
 RED="\e[31;1m"
@@ -195,8 +193,7 @@ function helpout {
     echo
     echo "    É possível misturar parâmetros nomeados com parâmetros posicionais. Neste"
     echo "    caso os parâmetros nomeados sempre terão preferência, sobrescrevendo os"
-    echo "    posicionais. Os parâmetros posicionais não sobrescrevem eles próprios,"
-    echo "    acumulando os valores caso eles seja duplicados"
+    echo "    posicionais."
     echo
 
     if [ "$1" = "autor" ]; then
@@ -219,7 +216,7 @@ function helperr {
     local err="$?"
 
     if [ -z "$err" ] || [ "$err" = "0" ]; then
-        err=$ERR_6X8X_UNEXPECTED
+        err=$ERR_UNEXPECTED
     fi
 
     if [ "$e" ]; then
@@ -243,14 +240,14 @@ function helperr {
 # Joga na variável global PARAMETER_HELPER o nome da lib que tratará os
 # argumentos passados pelo usuário
 function get_parameter_helper {
-    local DIRNAME="$(dirname "$0")"
+    local DIRNAME="$(pwd)"
     PARAMETER_HELPER="$DIRNAME/parameter-helper"
 
     if ! [ -f "$PARAMETER_HELPER" ]; then
         if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
             PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
         else
-            return $(m="Erro! \"$PARAMETER_HELPER_NAME\"" e=$ERR_6X8X_NOT_FOUND_PARAMETER_HELPER helperr)
+            return $(m="Erro! \"$PARAMETER_HELPER_NAME\"" e=$ERR_NOT_FOUND_PARAMETER_HELPER helperr)
         fi
     fi
 }
@@ -279,7 +276,7 @@ function adapter {
 
 # Processa os parâmetros passados pelo usuário
 function parameters {
-    source $PARAMETER_HELPER --create-global-args --create-global-exists --flag-params -out -replace-file rf --params -help -version -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" e=$ERR_6X8X_INVALID_ARGUMENTS helperr -v)
+    source $PARAMETER_HELPER --create-global-args --create-global-exists --flag-params -out -replace-file rf --params -help -version -lang -default -name -exec -icon -categories -filename -flag-exec -comment -dirname -out -replace-file n e i c f fe ct d rf @@ --default "$@" || return $(m="Erro! Argumentos Inválidos" e=$ERR_INVALID_ARGUMENTS helperr -v)
 
     # Verificando presença de --help
 
@@ -519,7 +516,7 @@ function run {
 # Função principal
 function main {
     if [ "$#" = 0 ]; then
-        return $(m="Erro! Argumentos vazios" e=$ERR_6X8X_EMPTY_ARGUMENTS helperr -v)
+        return $(m="Erro! Argumentos vazios" e=$ERR_EMPTY_ARGUMENTS helperr -v)
     fi
 
     # Joga na variável global PARAMETER_HELPER o nome da lib que tratará os
@@ -569,11 +566,11 @@ function main {
     # Verificando existência de argumentos obrigatórios
 
     if ! [ "$(bash -c "echo \"$desktop_entry\" | grep -E \"Name=|Name\[.*\]=\"")" ]; then
-        return $(m="Erro! O parâmetro --name é obrigatório!" e=$ERR_6X8X_NOT_FOUND_NAME helperr -v)
+        return $(m="Erro! O parâmetro --name é obrigatório!" e=$ERR_NOT_FOUND_NAME helperr -v)
     fi
 
     if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Exec=\"")" ]; then
-        return $(m="Erro! O parâmetro --exec é obrigatório!" e=$ERR_6X8X_NOT_FOUND_EXEC helperr -v)
+        return $(m="Erro! O parâmetro --exec é obrigatório!" e=$ERR_NOT_FOUND_EXEC helperr -v)
     fi
 
     if [ "$desktop_entry" ]; then
