@@ -61,13 +61,22 @@
 #     --exists: Lança erro se o parâmetro de --index não foi
 #         passado pelo usuário. Encerra a aplicação com sucesso
 #         caso o parâmetro foi passado. Opcional
-#     --sep: Separador utilizado para separar os vários elementos
-#         de uma lista de valores passados pelo usuário. Tal valor
-#         pode ser uma string de vários caracteres.
+#     --sep: Separador utilizado pela opção --create-array-args
+#         para separar os vários elementos de uma lista de valores
+#         passados pelo usuário. Tal valor pode ser uma string de
+#         vários caracteres. Se esta opção for passada mas não houver
+#         valor associado, o valor assumido é uma string vazia, criando
+#         arrays na qual cada posição possui um único caracter.
+#         Aconselha-se que o valor de --sep seja qualquer valor não usado
+#         em parâmetros. Se isto não for possível, utilize as as variáveis
+#         globais criadas com as opções --create-global-args pois tais
+#         variáveis não usam o valor definido para --sep.
 #         Valor padrão: $'\n'
 #     --is-param: String na qual todos os parâmetros nomeados devem
-#         começar. Este parâmetro deve sempre vir antes do parâmetro
-#         --params. Valor padrão: -
+#         começar Se esta opção for passada mas não houver valor
+#         associado a ela, o valor assumido é uma string vazia. Este
+#         parâmetro deve sempre vir antes do parâmetro --params.
+#         Valor padrão: -
 #     --params: Nomes dos parâmetros esperados para o usuário passar
 #         (ignorando o valor de --is-param, que por padrão é '-').
 #         Obrigatório
@@ -81,15 +90,18 @@
 #         mesmo nome de cada parâmetro, substituindo qualquer caracter
 #         que não for uma letra por underline. Se --create-global-args
 #         não for informado, esses arrays globais não serão criados.
-#         Opcional
+#         Se não for desejado essas variáveis estarem em escopo global,
+#         basta declará-las com o comando "local" do bash antes deste
+#         script ser chamado. Opcional
 #     --create-global-exists: Cria variáveis globais. Cada variável
 #         representa um parâmetro diferente. Cada variável possui 1 ou 0.
 #         Se o parâmetro foi informado pelo usuário a variável terá 1. Caso
 #         contrário, terá 0. O nome de cada variável é o mesmo nome de cada
 #         parâmetro, substituindo qualquer caracter que não for uma letra
-#         por underline e com o sufixo "_exists". Se
-#         --create-global-exists não for informado, essas variáveis globais
-#         não serão criadas. Opcional
+#         por underline e com o sufixo "_exists". Se --create-global-exists
+#         não for informado, essas variáveis globais não serão criadas. Se não
+#         for desejado essas variáveis estarem em escopo global,basta declará-las
+#         com o comando "local" do bash antes deste script ser chamado. Opcional
 #     --create-array-args: Nome do array global que conterá o valor de
 #         cada parâmetro na mesma posição da posição do parâmetro. Cada
 #         valor de um mesmo parâmetro é unido pelo valor de --sep. Se
@@ -121,6 +133,20 @@
 #     fi
 #
 # Exemplo 2:
+#
+#     source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20
+#
+#     echo "${v1[@]}" # Ecoa array vazio do parâmetro --v1
+#
+#     if [ "$nomes_exists" = 1 ]; then # Se o parâmetro --nomes foi passado
+#         echo "${nomes[@]}" # Este código não seria executado
+#     fi
+#
+#     if [ "$idades_exists" = 1 ]; then # Se o parâmetro -idades foi passado
+#         echo "${idades[@]}" # Ecoa array com as idades '18' e '20'
+#     fi
+#
+# Exemplo 3:
 #     source parameter-helper --create-array-args args --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro
 #
 #     shut_util_array nomes $'\n' "${args[1]}"
@@ -128,8 +154,8 @@
 #     # Ecoa array de tamanho 3 com os nomes '' 'Emanuel' e 'Pedro'
 #     echo "${nomes[@]}"
 #
-# Exemplo 3:
-#     # Se o parâmetro --v1 foi passado
+# Exemplo 4:
+#     # Se o parâmetro @v1 foi passado
 #     if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then
 #
 #         source parameter-helper --no-strict
@@ -139,7 +165,7 @@
 #         echo "${v1[@]}" # Ecoa array com '1', '2' e '3'
 #     fi
 #
-# Exemplo 4:
+# Exemplo 5:
 #     source parameter-helper --sep + --create-array-args args --create-array-exists exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro
 #
 #     shut_util_array v1 + "${args[0]}"
@@ -155,7 +181,7 @@
 #         echo "${nomes[@]}"
 #     fi
 #
-# Exemplo 5:
+# Exemplo 6:
 #     source parameter-helper --sep + --create-array-args --create-array-exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro
 #
 #     shut_util_array v1 + "${shut_parameterHelper_args[0]}"
@@ -171,7 +197,7 @@
 #         echo "${nomes[@]}"
 #     fi
 #
-# Exemplo 6: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
+# Exemplo 7: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
 #     IFS=$'+' # Define o separador do sistema
 #
 #     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'
@@ -269,13 +295,22 @@ function shut_parameterHelper_module {
         echo "        --exists: Lança erro se o parâmetro de --index não foi"
         echo "            passado pelo usuário. Encerra a aplicação com sucesso"
         echo "            caso o parâmetro foi passado. Opcional"
-        echo "        --sep: Separador utilizado para separar os vários elementos"
-        echo "            de uma lista de valores passados pelo usuário. Tal valor"
-        echo "            pode ser uma string de vários caracteres."
+        echo "        --sep: Separador utilizado pela opção --create-array-args"
+        echo "            para separar os vários elementos de uma lista de valores"
+        echo "            passados pelo usuário. Tal valor pode ser uma string de"
+        echo "            vários caracteres. Se esta opção for passada mas não houver"
+        echo "            valor associado, o valor assumido é uma string vazia, criando"
+        echo "            arrays na qual cada posição possui um único caracter."
+        echo "            Aconselha-se que o valor de --sep seja qualquer valor não usado"
+        echo "            em parâmetros. Se isto não for possível, utilize as as variáveis"
+        echo "            globais criadas com as opções --create-global-args pois tais"
+        echo "            variáveis não usam o valor definido para --sep."
         echo "            Valor padrão: \$'\n'"
         echo "        --is-param: String na qual todos os parâmetros nomeados devem"
-        echo "            começar. Este parâmetro deve sempre vir antes do parâmetro"
-        echo "            --params. Valor padrão: -"
+        echo "            começar Se esta opção for passada mas não houver valor"
+        echo "            associado a ela, o valor assumido é uma string vazia. Este"
+        echo "            parâmetro deve sempre vir antes do parâmetro --params."
+        echo "            Valor padrão: -"
         echo "        --params: Nomes dos parâmetros esperados para o usuário passar"
         echo "            (ignorando o valor de --is-param, que por padrão é '-')."
         echo "            Obrigatório"
@@ -289,15 +324,18 @@ function shut_parameterHelper_module {
         echo "            mesmo nome de cada parâmetro, substituindo qualquer caracter"
         echo "            que não for uma letra por underline. Se --create-global-args"
         echo "            não for informado, esses arrays globais não serão criados."
-        echo "            Opcional"
+        echo "            Se não for desejado essas variáveis estarem em escopo global,"
+        echo "            basta declará-las com o comando \"local\" do bash antes deste"
+        echo "            script ser chamado. Opcional"
         echo "        --create-global-exists: Cria variáveis globais. Cada variável"
         echo "            representa um parâmetro diferente. Cada variável possui 1 ou 0."
         echo "            Se o parâmetro foi informado pelo usuário a variável terá 1. Caso"
         echo "            contrário, terá 0. O nome de cada variável é o mesmo nome de cada"
         echo "            parâmetro, substituindo qualquer caracter que não for uma letra"
-        echo "            por underline e com o sufixo \"_exists\". Se"
-        echo "            --create-global-exists não for informado, essas variáveis globais"
-        echo "            não serão criadas. Opcional"
+        echo "            por underline e com o sufixo \"_exists\". Se --create-global-exists"
+        echo "            não for informado, essas variáveis globais não serão criadas. Se não"
+        echo "            for desejado essas variáveis estarem em escopo global,basta declará-las"
+        echo "            com o comando \"local\" do bash antes deste script ser chamado. Opcional"
         echo "        --create-array-args: Nome do array global que conterá o valor de"
         echo "            cada parâmetro na mesma posição da posição do parâmetro. Cada"
         echo "            valor de um mesmo parâmetro é unido pelo valor de --sep. Se"
@@ -329,6 +367,20 @@ function shut_parameterHelper_module {
         echo "        fi"
         echo
         echo "    Exemplo 2:"
+        echo
+        echo "        source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20"
+        echo
+        echo "        echo \"\${v1[@]}\" # Ecoa array vazio do parâmetro v1"
+        echo
+        echo "        if [ \"\$nomes_exists\" = 1 ]; then # Se o parâmetro nomes foi passado"
+        echo "            echo \"\${nomes[@]}\" # Este código não seria executado"
+        echo "        fi"
+        echo
+        echo "        if [ \"\$idades_exists\" = 1 ]; then # Se o parâmetro idades foi passado"
+        echo "            echo \"\${idades[@]}\" # Ecoa array com as idades '18' e '20'"
+        echo "        fi"
+        echo
+        echo "    Exemplo 3:"
         echo "        source parameter-helper --create-array-args args --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro"
         echo
         echo "        shut_util_array nomes \$'\n' \"\${args[1]}\""
@@ -336,8 +388,8 @@ function shut_parameterHelper_module {
         echo "        # Ecoa array de tamanho 3 com os nomes '' 'Emanuel' e 'Pedro'"
         echo "        echo \"\${nomes[@]}\""
         echo
-        echo "    Exemplo 3:"
-        echo "        # Se o parâmetro --v1 foi passado"
+        echo "    Exemplo 4:"
+        echo "        # Se o parâmetro @v1 foi passado"
         echo "        if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then"
         echo
         echo "            source parameter-helper --no-strict"
@@ -347,7 +399,7 @@ function shut_parameterHelper_module {
         echo "            echo \"\${v1[@]}\" # Ecoa array com '1', '2' e '3'"
         echo "        fi"
         echo
-        echo "    Exemplo 4:"
+        echo "    Exemplo 5:"
         echo "        source parameter-helper --sep + --create-array-args args --create-array-exists exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro"
         echo
         echo "        shut_util_array v1 + \"\${args[0]}\""
@@ -363,7 +415,7 @@ function shut_parameterHelper_module {
         echo "            echo \"\${nomes[@]}\""
         echo "        fi"
         echo
-        echo "    Exemplo 5:"
+        echo "    Exemplo 6:"
         echo "        source parameter-helper --sep + --create-array-args --create-array-exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro"
         echo
         echo "        shut_util_array v1 + \"\${shut_parameterHelper_args[0]}\""
@@ -379,7 +431,7 @@ function shut_parameterHelper_module {
         echo "            echo \"\${nomes[@]}\""
         echo "        fi"
         echo
-        echo "    Exemplo 6: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
+        echo "    Exemplo 7: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
         echo "        IFS=\$'+' # Define o separador do sistema"
         echo
         echo "        # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)"
