@@ -49,7 +49,7 @@
 #             os caracteres da string que não são letras por
 #             underline
 #
-#             Parâmetro: String a ter os caracteres  convertidos
+#             Parâmetro: String a ter os caracteres convertidos
 #
 # Parâmetros:
 #     --help: Mostra todas as opções. Opcional"
@@ -257,7 +257,7 @@ function shut_parameterHelper_module {
         echo "                os caracteres da string que não são letras por"
         echo "                underline"
         echo
-        echo "                Parâmetro: String a ter os caracteres  convertidos"
+        echo "                Parâmetro: String a ter os caracteres convertidos"
         echo
         echo "    Parâmetros:"
         echo "        --help: Mostra todas as opções. Opcional"
