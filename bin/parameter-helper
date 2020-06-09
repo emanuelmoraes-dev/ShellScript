@@ -604,18 +604,18 @@ function shut_parameterHelper_module {
                 fi
 
             elif [ "$start_args" = 1 ]; then
-                if [ "$present_exists" = 1 ]; then # Se houver a opção --exists
-                    continue                       # Os valores não precisam ser armazenados
-                fi
-
                 if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                     printf >&2 "\e[31;1m\nErro Interno! Contate o desenvolvedor. --params vazios!\e[m\n"
                     return $ERR_EMPTY_PARAMS # Finaliza Script com erro
                 fi
 
                 if [ -z "$param" ]; then           # Se nenhum parâmetro nomeado foi passado ainda
-                    printf >&2 "e[31;1m\nErro! Argumento \"$a\" inválido!"
+                    printf >&2 "e[31;1m\nErro! Argumento \"$a\" inválido!\e[m\n"
                     return $ERR_INVALID_ARGUMENT # Finaliza Script com erro
+                fi
+
+                if [ "$present_exists" = 1 ]; then # Se houver a opção --exists
+                    continue                       # Os valores não precisam ser armazenados
                 fi
 
                 len_params=${#params[@]}
