@@ -7,8 +7,8 @@
 #
 # AVISO:
 #     Ao usar este script com \"source\" APENAS as seguintes funções
-#     serão definas em escopo globais. Variáveis globais apenas são
-#     criadas pelos parâmetros --create-global-args e
+#     serão definas em escopo globais. Outras Variáveis globais apenas
+#     são criadas pelos parâmetros --create-global-args e
 #     --create-global-exists
 #
 #     *   shut_parameterHelper_module:
@@ -215,8 +215,8 @@ function shut_parameterHelper_module {
         echo
         echo "    AVISO:"
         echo "        Ao usar este script com \"source\" APENAS as seguintes funções"
-        echo "        serão definas em escopo globais. Variáveis globais apenas são"
-        echo "        criadas pelos parâmetros --create-global-args e"
+        echo "        serão definas em escopo globais. Outras variáveis globais apenas"
+        echo "        são criadas pelos parâmetros --create-global-args e"
         echo "        --create-global-exists"
         echo
         echo "        *   shut_parameterHelper_module:"
