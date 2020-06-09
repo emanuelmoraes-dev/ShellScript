@@ -205,6 +205,7 @@ function shut_parameterHelper_module {
     ## INVALID (5X)
     local ERR_INVALID_PARAMETER=52
     local ERR_INVALID_ARGUMENTS=53
+    local ERR_INVALID_ARGUMENT=54
 
     function _shut_parameterHelper_helpout {
         echo "    parameter-helper@$VERSION"
@@ -517,6 +518,7 @@ function shut_parameterHelper_module {
                     is_param=""
                 elif [ "$a" = "@@" ]; then
                     start_args=1
+                    param=""
                 fi
 
             elif [ "$start_args" = 0 ] && [ "$param" != "--params" ] && [ "$param" != "--flag-params" ] && [[ "$a" == --* ]]; then
@@ -608,7 +610,12 @@ function shut_parameterHelper_module {
 
                 if [ "${#params[@]}" = "0" ]; then # Se 'params' estiver vazio
                     printf >&2 "\e[31;1m\nErro Interno! Contate o desenvolvedor. --params vazios!\e[m\n"
-                    return $ERR_EMPTY_PARAMS       # Finaliza Script com erro
+                    return $ERR_EMPTY_PARAMS # Finaliza Script com erro
+                fi
+
+                if [ -z "$param" ]; then           # Se nenhum parâmetro nomeado foi passado ainda
+                    printf >&2 "e[31;1m\nErro! Argumento \"$a\" inválido!"
+                    return $ERR_INVALID_ARGUMENT # Finaliza Script com erro
                 fi
 
                 len_params=${#params[@]}
