@@ -577,7 +577,7 @@ function shut_parameterHelper_module {
                         global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
                         eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
                         if [ "$len_global_variable_name" != 0 ]; then                               # Se o tamanho do array global para os valores deste parâmetro for zero
-                            eval $global_variable_name=()                                           # O array global para os valores deste parâmetro é inicializado com nenhum valor
+                            eval $global_variable_name='()'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
                         fi
                     fi
                 elif shut_util_contains "$a" "${params[@]}"; then
@@ -593,7 +593,7 @@ function shut_parameterHelper_module {
                         global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
                         eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
                         if [ "$len_global_variable_name" != 0 ]; then                               # Se o tamanho do array global para os valores deste parâmetro for zero
-                            eval $global_variable_name=()                                           # O array global para os valores deste parâmetro é inicializado com nenhum valor
+                            eval $global_variable_name='()'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
                         fi
                     fi
                 elif [ "$present_no_strict" = "0" ]; then
@@ -620,7 +620,7 @@ function shut_parameterHelper_module {
                             empty_param=0                                  # O parâmetro tem valor
                             if [ "$present_create_global_args" = 1 ]; then # Se a flag --create-global-args estiver presente
                                 global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
-                                eval $global_variable_name=("$a")                                           # O array global para os valores deste parâmetro é inicializado com nenhum valor
+                                eval $global_variable_name='("$a")'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
                             fi
                         else
                             _shut_parameterHelper_args[$i]="${_shut_parameterHelper_args[$i]}${sep}${a}" # Um novo valor para o parâmetro de posição 'i'
