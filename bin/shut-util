@@ -185,7 +185,7 @@ function shut_util_is_letter {
 }
 
 # Ecoa na saída padrão uma string substituindo todos
-# os caracteres da string que são letras por
+# os caracteres da string que não são letras por
 # underline
 #
 # Parâmetro: String a ter os caracteres  convertidos
