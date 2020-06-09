@@ -694,7 +694,7 @@ function shut_parameterHelper_module {
                     fi
                 done
             else
-                printf >&2 "\e[31;1m\nErro Interno! Argumentos Inválidos a partir de \"$a\"!\e[m\n"
+                printf >&2 "\e[31;1m\nErro Interno! Argumentos inválidos a partir de \"$a\"!\e[m\n"
                 return $ERR_INVALID_ARGUMENTS # Finaliza Script com erro
             fi
         done
