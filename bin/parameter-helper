@@ -610,7 +610,7 @@ function shut_parameterHelper_module {
                 fi
 
                 if [ -z "$param" ]; then           # Se nenhum parâmetro nomeado foi passado ainda
-                    printf >&2 "e[31;1m\nErro! Argumento \"$a\" inválido!\e[m\n"
+                    printf >&2 "\e[31;1m\nErro! Argumento \"$a\" inválido!\e[m\n"
                     return $ERR_INVALID_ARGUMENT # Finaliza Script com erro
                 fi
 
