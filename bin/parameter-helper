@@ -456,7 +456,7 @@ function shut_parameterHelper_module {
         local local_param                                # Variável temporária para armazenar um parâmetro local
 
         if [ "$#" = 0 ]; then
-            printf >&2 "\e[31;1m\nErro! Argumentos não definidos!\e[m\n"
+            printf >&2 "\e[31;1m\nErro Interno! Argumentos não definidos!\e[m\n"
             return $ERR_EMPTY_ARGS
         fi
 
