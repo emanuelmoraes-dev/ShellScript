@@ -62,16 +62,15 @@
 #         passado pelo usuário. Encerra a aplicação com sucesso
 #         caso o parâmetro foi passado. Opcional
 #     --sep: Separador utilizado pela opção --create-array-args
-#         para separar os vários elementos de uma lista de valores
-#         passados pelo usuário. Tal valor pode ser uma string de
-#         vários caracteres. Se esta opção for passada mas não houver
-#         valor associado, o valor assumido é uma string vazia, criando
-#         arrays na qual cada posição possui um único caracter.
-#         Aconselha-se que o valor de --sep seja qualquer valor não usado
-#         em parâmetros. Se isto não for possível, utilize as as variáveis
-#         globais criadas com as opções --create-global-args pois tais
-#         variáveis não usam o valor definido para --sep.
-#         Valor padrão: $'\n'
+#         para criar strings com os vários valores passados pelo
+#         usuário separados por este separador. Tal separador pode
+#         ser uma string de vários caracteres. Se esta opção for
+#         passada mas não houver valor associado, o valor assumido
+#         é uma string vazia. Aconselha-se que o valor de --sep seja
+#         qualquer valor não usado em parâmetros. Caso isso seja um
+#         grande incoveniente, utilize as variáveis globais criadas
+#         com as opções --create-global-args, pois tais variáveis não
+#         usam este separador. Valor padrão: $'\n'
 #     --is-param: String na qual todos os parâmetros nomeados devem
 #         começar Se esta opção for passada mas não houver valor
 #         associado a ela, o valor assumido é uma string vazia. Este
@@ -94,20 +93,24 @@
 #         basta declará-las com o comando "local" do bash antes deste
 #         script ser chamado. Opcional
 #     --create-global-exists: Cria variáveis globais. Cada variável
-#         representa um parâmetro diferente. Cada variável possui 1 ou 0.
-#         Se o parâmetro foi informado pelo usuário a variável terá 1. Caso
-#         contrário, terá 0. O nome de cada variável é o mesmo nome de cada
-#         parâmetro, substituindo qualquer caracter que não for uma letra
-#         por underline e com o sufixo "_exists". Se --create-global-exists
-#         não for informado, essas variáveis globais não serão criadas. Se não
-#         for desejado essas variáveis estarem em escopo global,basta declará-las
-#         com o comando "local" do bash antes deste script ser chamado. Opcional
-#     --create-array-args: Nome do array global que conterá o valor de
-#         cada parâmetro na mesma posição da posição do parâmetro. Cada
-#         valor de um mesmo parâmetro é unido pelo valor de --sep. Se
-#         não informado, o array não é criado. Se --create-arrays-args
-#         existir mas não houver valor para ele, o nome do array global
-#         será definido como "shut_parameterHelper_args". Opcional
+#         representa um parâmetro diferente. Cada variável possui 1 ou
+#         0. Se o parâmetro foi informado pelo usuário a variável terá 1.
+#         Caso contrário, terá 0. O nome de cada variável é o mesmo nome
+#         de cada parâmetro, substituindo qualquer caracter que não for
+#         uma letra por underline e com o sufixo "_exists". Se
+#         --create-global-exists não for informado, essas variáveis
+#         globais não serão criadas. Se não for desejado essas variáveis
+#         estarem em escopo global,basta declará-lascom o comando "local"
+#         do bash antes deste script ser chamado. Opcional
+#     --create-array-args: Nome do array global que conterá os valores de
+#         cada parâmetro declarado em --params. Cada posição do array
+#         refere-se a um parâmetro na mesma posição que ele foi declarado
+#         em --params. Nesta posição encontra-se uma string com todos os
+#         valores referentes a esse parâmetro separadas pela string definida
+#         por --sep. Se --create-array-args não for informado, o array não é
+#         criado. Se --create-arrays-args existir mas não houver valor para
+#         ele, o nome do array global será definido como
+#         "shut_parameterHelper_args". Opcional
 #     --create-array-exists: Nome do array global para informar se cada
 #         parâmetro de cada posição foi infomado pelo usuário
 #         (0 - não, 1 - sim). Se o --create-array-exists existir mas não
@@ -296,16 +299,15 @@ function shut_parameterHelper_module {
         echo "            passado pelo usuário. Encerra a aplicação com sucesso"
         echo "            caso o parâmetro foi passado. Opcional"
         echo "        --sep: Separador utilizado pela opção --create-array-args"
-        echo "            para separar os vários elementos de uma lista de valores"
-        echo "            passados pelo usuário. Tal valor pode ser uma string de"
-        echo "            vários caracteres. Se esta opção for passada mas não houver"
-        echo "            valor associado, o valor assumido é uma string vazia, criando"
-        echo "            arrays na qual cada posição possui um único caracter."
-        echo "            Aconselha-se que o valor de --sep seja qualquer valor não usado"
-        echo "            em parâmetros. Se isto não for possível, utilize as as variáveis"
-        echo "            globais criadas com as opções --create-global-args pois tais"
-        echo "            variáveis não usam o valor definido para --sep."
-        echo "            Valor padrão: \$'\n'"
+        echo "            para criar strings com os vários valores passados pelo"
+        echo "            usuário separados por este separador. Tal separador pode"
+        echo "            ser uma string de vários caracteres. Se esta opção for"
+        echo "            passada mas não houver valor associado, o valor assumido"
+        echo "            é uma string vazia. Aconselha-se que o valor de --sep seja"
+        echo "            qualquer valor não usado em parâmetros. Caso isso seja um"
+        echo "            grande incoveniente, utilize as variáveis globais criadas"
+        echo "            com as opções --create-global-args, pois tais variáveis não"
+        echo "            usam este separador. Valor padrão: \$'\n'"
         echo "        --is-param: String na qual todos os parâmetros nomeados devem"
         echo "            começar Se esta opção for passada mas não houver valor"
         echo "            associado a ela, o valor assumido é uma string vazia. Este"
@@ -328,20 +330,24 @@ function shut_parameterHelper_module {
         echo "            basta declará-las com o comando \"local\" do bash antes deste"
         echo "            script ser chamado. Opcional"
         echo "        --create-global-exists: Cria variáveis globais. Cada variável"
-        echo "            representa um parâmetro diferente. Cada variável possui 1 ou 0."
-        echo "            Se o parâmetro foi informado pelo usuário a variável terá 1. Caso"
-        echo "            contrário, terá 0. O nome de cada variável é o mesmo nome de cada"
-        echo "            parâmetro, substituindo qualquer caracter que não for uma letra"
-        echo "            por underline e com o sufixo \"_exists\". Se --create-global-exists"
-        echo "            não for informado, essas variáveis globais não serão criadas. Se não"
-        echo "            for desejado essas variáveis estarem em escopo global,basta declará-las"
-        echo "            com o comando \"local\" do bash antes deste script ser chamado. Opcional"
-        echo "        --create-array-args: Nome do array global que conterá o valor de"
-        echo "            cada parâmetro na mesma posição da posição do parâmetro. Cada"
-        echo "            valor de um mesmo parâmetro é unido pelo valor de --sep. Se"
-        echo "            não informado, o array não é criado. Se --create-arrays-args"
-        echo "            existir mas não houver valor para ele, o nome do array global"
-        echo "            será definido como \"shut_parameterHelper_args\". Opcional"
+        echo "            representa um parâmetro diferente. Cada variável possui 1 ou"
+        echo "            0. Se o parâmetro foi informado pelo usuário a variável terá 1."
+        echo "            Caso contrário, terá 0. O nome de cada variável é o mesmo nome"
+        echo "            de cada parâmetro, substituindo qualquer caracter que não for"
+        echo "            uma letra por underline e com o sufixo \"_exists\". Se"
+        echo "            --create-global-exists não for informado, essas variáveis"
+        echo "            globais não serão criadas. Se não for desejado essas variáveis"
+        echo "            estarem em escopo global,basta declará-lascom o comando \"local\""
+        echo "            do bash antes deste script ser chamado. Opcional"
+        echo "        --create-array-args: Nome do array global que conterá os valores de"
+        echo "            cada parâmetro declarado em --params. Cada posição do array"
+        echo "            refere-se a um parâmetro na mesma posição que ele foi declarado"
+        echo "            em --params. Nesta posição encontra-se uma string com todos os"
+        echo "            valores referentes a esse parâmetro separadas pela string definida"
+        echo "            por --sep. Se --create-array-args não for informado, o array não é"
+        echo "            criado. Se --create-arrays-args existir mas não houver valor para"
+        echo "            ele, o nome do array global será definido como"
+        echo "            \"shut_parameterHelper_args\". Opcional"
         echo "        --create-array-exists: Nome do array global para informar se cada"
         echo "            parâmetro de cada posição foi infomado pelo usuário"
         echo "            (0 - não, 1 - sim). Se o --create-array-exists existir mas não"
