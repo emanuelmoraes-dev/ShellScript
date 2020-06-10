@@ -1,31 +1,31 @@
 #!/bin/bash
 
 function helpout {
-    echo "    Script que cria e define o serviço de executar um arquivo com permissões"
-    echo "    administrativas ao iniciar o computador"
+    echo "Script que cria e define o serviço de executar um arquivo com permissões"
+    echo "administrativas ao iniciar o computador"
     echo
-    echo "    Para ativar o serviço depois de executado o script, deve-se executar os"
-    echo "    seguinte comandos:"
+    echo "Para ativar o serviço depois de executado o script, deve-se executar os"
+    echo "seguinte comandos:"
     echo
-    echo "    systemctl enable rc-exec-local.service"
-    echo "    systemctl start rc-exec-local.service"
+    echo "systemctl enable rc-exec-local.service"
+    echo "systemctl start rc-exec-local.service"
     echo
-    echo "    Para verificar se o serviço foi ativado, dê o seguinte comando:"
+    echo "Para verificar se o serviço foi ativado, dê o seguinte comando:"
     echo
-    echo "    systemctl status rc-exec-local.service"
+    echo "systemctl status rc-exec-local.service"
     echo
-    echo "    Para parar o serviço, dê os seguintes comandos"
+    echo "Para parar o serviço, dê os seguintes comandos"
     echo
-    echo "    systemctl stop rc-exec-local.service"
-    echo "    systemctl disable rc-exec-local.service"
+    echo "systemctl stop rc-exec-local.service"
+    echo "systemctl disable rc-exec-local.service"
     echo
-    echo "    Script criado tento como base o tutorial: https://www.netroby.com/view/3895"
+    echo "Script criado tento como base o tutorial: https://www.netroby.com/view/3895"
     echo
-    echo "    Parâmetro: path do arquivo. Valor padrão: /etc/rc.local"
+    echo "Parâmetro: path do arquivo. Valor padrão: /etc/rc.local"
     echo
-    echo "    Autor: Emanuel Moraes"
-    echo "    Email: emanuelmoraes297@gmail.com"
-    echo "    Github: https://github.com/emanuelmoraes-dev"
+    echo "Autor: Emanuel Moraes"
+    echo "Email: emanuelmoraes297@gmail.com"
+    echo "Github: https://github.com/emanuelmoraes-dev"
     echo
 }
 
