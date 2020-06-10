@@ -5,7 +5,7 @@
 # Utilitário cujo objetivo é receber um conjunto de parâmetros
 # nomeados e separar os valores de seus parâmetros.
 #
-# AVISO:
+# Variáveis Exportadas:
 #     Ao usar este script com \"source\" APENAS as seguintes funções
 #     serão definas em escopo globais. Outras Variáveis globais apenas
 #     são criadas pelos parâmetros --create-global-args e
@@ -50,6 +50,8 @@
 #             underline
 #
 #             Parâmetro: String a ter os caracteres convertidos
+#     *   shut_util_remove_begin_underlines:
+#             Remove os underlines iniciais de uma string
 #
 # Parâmetros:
 #     --help: Mostra todas as opções. Opcional"
@@ -86,12 +88,12 @@
 #     --create-global-args: Cria arrays globais. Cada array representa
 #         um parâmetro diferente. Cada posição de um array é um valor
 #         diferente passado pelo usuário. O nome de cada array é o
-#         mesmo nome de cada parâmetro, substituindo qualquer caracter
-#         que não for uma letra por underline. Se --create-global-args
-#         não for informado, esses arrays globais não serão criados.
-#         Se não for desejado essas variáveis estarem em escopo global,
-#         basta declará-las com o comando "local" do bash antes deste
-#         script ser chamado. Opcional
+#         mesmo nome de cada parâmetro, substituindo (por padrão)
+#         qualquer caracter que não for uma letra por underline. Se
+#         --create-global-args não for informado, esses arrays globais
+#         não serão criados. Se não for desejado essas variáveis estarem
+#         em escopo global, basta declará-las com o comando "local" do bash
+#         antes deste script ser chamado. Opcional
 #     --create-global-exists: Cria variáveis globais. Cada variável
 #         representa um parâmetro diferente. Cada variável possui 1 ou
 #         0. Se o parâmetro foi informado pelo usuário a variável terá 1.
@@ -100,8 +102,11 @@
 #         uma letra por underline e com o sufixo "_exists". Se
 #         --create-global-exists não for informado, essas variáveis
 #         globais não serão criadas. Se não for desejado essas variáveis
-#         estarem em escopo global,basta declará-lascom o comando "local"
+#         estarem em escopo global, basta declará-las com o comando "local"
 #         do bash antes deste script ser chamado. Opcional
+#     --uremove: Flag responsável por remover as underlines iniciais das
+#         variáveis globais criadas pelos parâmetros --create-global-args e
+#         --create-global-exists
 #     --create-array-args: Nome do array global que conterá os valores de
 #         cada parâmetro declarado em --params. Cada posição do array
 #         refere-se a um parâmetro na mesma posição que ele foi declarado
@@ -137,7 +142,7 @@
 #
 # Exemplo 2:
 #
-#     source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20
+#     source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20
 #
 #     echo "${v1[@]}" # Ecoa array vazio do parâmetro --v1
 #
@@ -150,6 +155,20 @@
 #     fi
 #
 # Exemplo 3:
+#
+#     source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20
+#
+#     echo "${v1[@]}" # Ecoa array vazio do parâmetro --v1
+#
+#     if [ "$nomes_exists" = 1 ]; then # Se o parâmetro --nomes foi passado
+#         echo "${nomes[@]}" # Este código não seria executado
+#     fi
+#
+#     if [ "$idades_exists" = 1 ]; then # Se o parâmetro -idades foi passado
+#         echo "${idades[@]}" # Ecoa array com as idades '18' e '20'
+#     fi
+#
+# Exemplo 4:
 #     source parameter-helper --create-array-args args --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro
 #
 #     shut_util_array nomes $'\n' "${args[1]}"
@@ -157,7 +176,7 @@
 #     # Ecoa array de tamanho 3 com os nomes '' 'Emanuel' e 'Pedro'
 #     echo "${nomes[@]}"
 #
-# Exemplo 4:
+# Exemplo 5:
 #     # Se o parâmetro @v1 foi passado
 #     if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then
 #
@@ -168,7 +187,7 @@
 #         echo "${v1[@]}" # Ecoa array com '1', '2' e '3'
 #     fi
 #
-# Exemplo 5:
+# Exemplo 6:
 #     source parameter-helper --sep + --create-array-args args --create-array-exists exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro
 #
 #     shut_util_array v1 + "${args[0]}"
@@ -184,7 +203,7 @@
 #         echo "${nomes[@]}"
 #     fi
 #
-# Exemplo 6:
+# Exemplo 7:
 #     source parameter-helper --sep + --create-array-args --create-array-exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro
 #
 #     shut_util_array v1 + "${shut_parameterHelper_args[0]}"
@@ -200,7 +219,7 @@
 #         echo "${nomes[@]}"
 #     fi
 #
-# Exemplo 7: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
+# Exemplo 8: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
 #     IFS=$'+' # Define o separador do sistema
 #
 #     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'
@@ -228,6 +247,7 @@ function shut_parameterHelper_module {
     local ERR_NOT_FOUND_SHUT_UTIL=31
     local ERR_NOT_FOUND_SHUT_UTIL_CONTAINS=32
     local ERR_NOT_FOUND_SHUT_UTIL_ADAPTER_TO_VARIABLE_NAME=33
+    local ERR_NOT_FOUND_SHUT_UTIL_REMOVE_BEGIN_UNDERLINES=34
     ## EMPTY (4X)
     local ERR_EMPTY_PARAMS=41
     local ERR_EMPTY_ARGS=42
@@ -242,7 +262,7 @@ function shut_parameterHelper_module {
         echo "Utilitário cujo objetivo é receber um conjunto de parâmetros"
         echo "nomeados e separar os valores de seus parâmetros"
         echo
-        echo "AVISO:"
+        echo "Variáveis Exportadas:"
         echo "    Ao usar este script com \"source\" APENAS as seguintes funções"
         echo "    serão definas em escopo globais. Outras variáveis globais apenas"
         echo "    são criadas pelos parâmetros --create-global-args e"
@@ -287,6 +307,8 @@ function shut_parameterHelper_module {
         echo "            underline"
         echo
         echo "            Parâmetro: String a ter os caracteres convertidos"
+        echo "    *   shut_util_remove_begin_underlines:"
+        echo "            Remove os underlines iniciais de uma string"
         echo
         echo "Parâmetros:"
         echo "    --help: Mostra todas as opções. Opcional"
@@ -323,12 +345,12 @@ function shut_parameterHelper_module {
         echo "    --create-global-args: Cria arrays globais. Cada array representa"
         echo "        um parâmetro diferente. Cada posição de um array é um valor"
         echo "        diferente passado pelo usuário. O nome de cada array é o"
-        echo "        mesmo nome de cada parâmetro, substituindo qualquer caracter"
-        echo "        que não for uma letra por underline. Se --create-global-args"
-        echo "        não for informado, esses arrays globais não serão criados."
-        echo "        Se não for desejado essas variáveis estarem em escopo global,"
-        echo "        basta declará-las com o comando \"local\" do bash antes deste"
-        echo "        script ser chamado. Opcional"
+        echo "        mesmo nome de cada parâmetro, substituindo (por padrão)"
+        echo "        qualquer caracter que não for uma letra por underline. Se"
+        echo "        --create-global-args não for informado, esses arrays globais"
+        echo "        não serão criados. Se não for desejado essas variáveis estarem"
+        echo "        em escopo global, basta declará-las com o comando \"local\" do bash"
+        echo "        antes deste script ser chamado. Opcional"
         echo "    --create-global-exists: Cria variáveis globais. Cada variável"
         echo "        representa um parâmetro diferente. Cada variável possui 1 ou"
         echo "        0. Se o parâmetro foi informado pelo usuário a variável terá 1."
@@ -337,8 +359,11 @@ function shut_parameterHelper_module {
         echo "        uma letra por underline e com o sufixo \"_exists\". Se"
         echo "        --create-global-exists não for informado, essas variáveis"
         echo "        globais não serão criadas. Se não for desejado essas variáveis"
-        echo "        estarem em escopo global,basta declará-lascom o comando \"local\""
+        echo "        estarem em escopo global, basta declará-las com o comando \"local\""
         echo "        do bash antes deste script ser chamado. Opcional"
+        echo "    --uremove: Flag responsável por remover as underlines iniciais das"
+        echo "        variáveis globais criadas pelos parâmetros --create-global-args e"
+        echo "        --create-global-exists"
         echo "    --create-array-args: Nome do array global que conterá os valores de"
         echo "        cada parâmetro declarado em --params. Cada posição do array"
         echo "        refere-se a um parâmetro na mesma posição que ele foi declarado"
@@ -374,7 +399,7 @@ function shut_parameterHelper_module {
         echo
         echo "Exemplo 2:"
         echo
-        echo "    source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20"
+        echo "    source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20"
         echo
         echo "    echo \"\${v1[@]}\" # Ecoa array vazio do parâmetro v1"
         echo
@@ -387,6 +412,20 @@ function shut_parameterHelper_module {
         echo "    fi"
         echo
         echo "Exemplo 3:"
+        echo
+        echo "    source parameter-helper --is-param --create-global-args --create-global-exists --params v1 nomes idades @@ idades 18 20"
+        echo
+        echo "    echo \"\${v1[@]}\" # Ecoa array vazio do parâmetro v1"
+        echo
+        echo "    if [ \"\$nomes_exists\" = 1 ]; then # Se o parâmetro nomes foi passado"
+        echo "        echo \"\${nomes[@]}\" # Este código não seria executado"
+        echo "    fi"
+        echo
+        echo "    if [ \"\$idades_exists\" = 1 ]; then # Se o parâmetro idades foi passado"
+        echo "        echo \"\${idades[@]}\" # Ecoa array com as idades '18' e '20'"
+        echo "    fi"
+        echo
+        echo "Exemplo 4:"
         echo "    source parameter-helper --create-array-args args --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro"
         echo
         echo "    shut_util_array nomes \$'\n' \"\${args[1]}\""
@@ -394,7 +433,7 @@ function shut_parameterHelper_module {
         echo "    # Ecoa array de tamanho 3 com os nomes '' 'Emanuel' e 'Pedro'"
         echo "    echo \"\${nomes[@]}\""
         echo
-        echo "Exemplo 4:"
+        echo "Exemplo 5:"
         echo "    # Se o parâmetro @v1 foi passado"
         echo "    if parameter-helper --exists --is-param @ --index 0 --params v1 nomes idades @@ @v1 1 2 3 @idades 18 20 @nomes Emanuel Pedro; then"
         echo
@@ -405,7 +444,7 @@ function shut_parameterHelper_module {
         echo "        echo \"\${v1[@]}\" # Ecoa array com '1', '2' e '3'"
         echo "    fi"
         echo
-        echo "Exemplo 5:"
+        echo "Exemplo 6:"
         echo "    source parameter-helper --sep + --create-array-args args --create-array-exists exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro"
         echo
         echo "    shut_util_array v1 + \"\${args[0]}\""
@@ -421,7 +460,7 @@ function shut_parameterHelper_module {
         echo "        echo \"\${nomes[@]}\""
         echo "    fi"
         echo
-        echo "Exemplo 6:"
+        echo "Exemplo 7:"
         echo "    source parameter-helper --sep + --create-array-args --create-array-exists --params -v1 -nomes idades @@ -idades 18 20 --nomes Emanuel Pedro"
         echo
         echo "    shut_util_array v1 + \"\${shut_parameterHelper_args[0]}\""
@@ -437,7 +476,7 @@ function shut_parameterHelper_module {
         echo "        echo \"\${nomes[@]}\""
         echo "    fi"
         echo
-        echo "Exemplo 7: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
+        echo "Exemplo 8: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
         echo "    IFS=\$'+' # Define o separador do sistema"
         echo
         echo "    # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)"
@@ -493,6 +532,7 @@ function shut_parameterHelper_module {
         local present_exists=0                           # Flag para indicar se o parâmetro "--exists" está presente
         local present_create_global_args=0               # Flag para indicar se o parâmetro "--create-global-args" está presente
         local present_create_global_exists=0             # Flag para indicar se o parâmetro "--create-global-exists" está presente
+        local present_uremove=0                          # Flag para indicar se o parâmetro "--uremove" está presente
         local present_create_array_args=0                # Flag para indicar se o parâmetro "--create-array-args" está presente
         local present_create_array_exists=0              # Flag para indicar se o parâmetro "--create-array-exists" está presente
         local present_out=0                              # Flag para indicar se o parâmetro "--out" está presente
@@ -520,7 +560,8 @@ function shut_parameterHelper_module {
 
         (
             (shut_util_contains 1> /dev/null 2> /dev/null || return $ERR_NOT_FOUND_SHUT_UTIL_CONTAINS) &&
-            (shut_util_adapter_to_variable_name 1> /dev/null 2> /dev/null || return $ERR_NOT_FOUND_SHUT_UTIL_ADAPTER_TO_VARIABLE_NAME)
+            (shut_util_adapter_to_variable_name 1> /dev/null 2> /dev/null || return $ERR_NOT_FOUND_SHUT_UTIL_ADAPTER_TO_VARIABLE_NAME) &&
+            (shut_util_remove_begin_underlines 1> /dev/null 2> /dev/null || return $ERR_NOT_FOUND_SHUT_UTIL_REMOVE_BEGIN_UNDERLINES)
         ) || (
             err="$?"
             case "$err" in
@@ -528,6 +569,8 @@ function shut_parameterHelper_module {
                     printf >&2 "\e[31;1m\nErro Interno! \"shut_util_contains\" não encontrado!\e[m\n";;
                 $ERR_NOT_FOUND_SHUT_UTIL_ADAPTER_TO_VARIABLE_NAME)
                     printf >&2 "\e[31;1m\nErro Interno! \"shut_util_adapter_to_variable_name\" não encontrado!\e[m\n";;
+                $ERR_NOT_FOUND_SHUT_UTIL_REMOVE_BEGIN_UNDERLINES)
+                    printf >&2 "\e[31;1m\nErro Interno! \"shut_util_remove_begin_underlines\" não encontrado!\e[m\n";;
                 *)
                     printf >&2 "\e[31;1m\nErro Interno Inesperado!\e[m\n";;
             esac
@@ -544,6 +587,7 @@ function shut_parameterHelper_module {
                 [ "$a" = "--exists" ] ||
                 [ "$a" = "--create-global-args" ] ||
                 [ "$a" = "--create-global-exists" ] ||
+                [ "$a" = "--uremove" ] ||
                 [ "$a" = "--create-array-args" ] ||
                 [ "$a" = "--create-array-exists" ] ||
                 [ "$a" = "--out" ] ||
@@ -564,6 +608,8 @@ function shut_parameterHelper_module {
                     present_create_global_args=1
                 elif [ "$a" = "--create-global-exists" ]; then
                     present_create_global_exists=1
+                elif [ "$a" == "--uremove" ]; then
+                    present_uremove=1
                 elif [ "$a" = "--create-array-args" ]; then
                     present_create_array_args=1
                 elif [ "$a" = "--create-array-exists" ]; then
@@ -635,6 +681,9 @@ function shut_parameterHelper_module {
                     if [ "$i" != "-1" ]; then                                                   # Se o parâmetro existem em "params"
                         _shut_parameterHelper_args[$i]=""                                           # Limpa os valores deste parâmetro
                         global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
+                        if [ "$present_uremove" = 1 ]; then                                         # Se --uremove foi passado
+                            global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
+                        fi
                         eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
                         if [ "$len_global_variable_name" != 0 ]; then                               # Se o tamanho do array global para os valores deste parâmetro for zero
                             eval $global_variable_name='()'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
@@ -651,6 +700,9 @@ function shut_parameterHelper_module {
                     if [ "$i" != "-1" ]; then                                                   # Se o parâmetro existem em "params"
                         _shut_parameterHelper_args[$i]=""                                           # Limpa os valores deste parâmetro
                         global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
+                        if [ "$present_uremove" = 1 ]; then                                         # Se --uremove foi passado
+                            global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
+                        fi
                         eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
                         if [ "$len_global_variable_name" != 0 ]; then                               # Se o tamanho do array global para os valores deste parâmetro for zero
                             eval $global_variable_name='()'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
@@ -685,12 +737,18 @@ function shut_parameterHelper_module {
                             empty_param=0                                  # O parâmetro tem valor
                             if [ "$present_create_global_args" = 1 ]; then # Se a flag --create-global-args estiver presente
                                 global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
+                                if [ "$present_uremove" = 1 ]; then                                         # Se --uremove foi passado
+                                    global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
+                                fi
                                 eval $global_variable_name='("$a")'                                         # O array global para os valores deste parâmetro é inicializado com nenhum valor
                             fi
                         else
                             _shut_parameterHelper_args[$i]="${_shut_parameterHelper_args[$i]}${sep}${a}" # Um novo valor para o parâmetro de posição 'i'
                             if [ "$present_create_global_args" = 1 ]; then                               # Se a flag --create-global-args estiver presente
                                 global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")" # Nome do array global para os valores deste parâmetro
+                                if [ "$present_uremove" = 1 ]; then                                         # Se --uremove foi passado
+                                    global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
+                                fi
                                 eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
                                 eval $global_variable_name[$len_global_variable_name]="$a"                  # O array global para os valores deste parâmetro é inicializado com nenhum valor
                             fi
@@ -727,6 +785,9 @@ function shut_parameterHelper_module {
             if [ "$present_create_global_exists" = 1 ]; then
                 for ((i = 0; i < len_params; i++)); do
                     global_variable_name="$(shut_util_adapter_to_variable_name "${params[i]}")_exists"
+                    if [ "$present_uremove" = 1 ]; then # Se --uremove foi passado
+                        global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
+                    fi
 
                     if shut_util_contains "${params[i]}" "${used_params[@]}"; then
                         eval $global_variable_name=1
