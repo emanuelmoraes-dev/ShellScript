@@ -206,3 +206,25 @@ function shut_util_adapter_to_variable_name {
     done
     echo "$rt"
 }
+
+# Remove os underlines iniciais de uma string
+function shut_util_remove_begin_underlines {
+    local ok=0
+    local target="$@"
+    local len_target="${#target}"
+    local rt
+    local ch
+    local i
+    for ((i = 0; i < len_target; i++)); do
+        ch="${target:i:1}"
+
+        if [ "$ok" = 0 ] && [ "$ch" = "_" ];then
+            ch=""
+        elif [ "$ok" = 0 ]; then
+            ok=1
+        fi
+
+        rt="${rt}${ch}"
+    done
+    echo "$rt"
+}
