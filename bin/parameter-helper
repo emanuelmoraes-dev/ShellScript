@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# parameter-helper@2.0.0
+# parameter-helper@2.0.1
 #
 # Utilitário cujo objetivo é receber um conjunto de parâmetros
 # nomeados e separar os valores de seus parâmetros.
@@ -247,7 +247,7 @@
 # Github: https://github.com/emanuelmoraes-dev
 
 function shut_parameterHelper_module {
-    local VERSION=2.0.0
+    local VERSION=2.0.1
 
     # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
     local SHUT_UTIL_NAME="shut-util"

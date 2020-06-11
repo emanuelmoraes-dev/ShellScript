@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VERSION=2.0.0
+VERSION=2.0.1
 
-# gendesk@2.0.0
+# gendesk@2.0.1
 #
 # Script responsável por criar um lançador de aplicativo para uma aplicação
 # qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo
