@@ -103,6 +103,8 @@ ERR_NOT_FOUND_EXEC=63
 ERR_EMPTY_ARGUMENTS=71
 ## INVALID (8x)
 ERR_INVALID_ARGUMENTS=81
+ERR_INVALID_DIRNAME=82
+ERR_INVALID_FILENAME=83
 
 # CORES
 RED="\e[31;1m"
@@ -206,7 +208,7 @@ function helpout {
 
 function logerr {
     local message="$@"
-    printf >&2 "${ERROR_THEME}\n  ${message}${END_COLOR}\n"
+    printf >&2 "${ERROR_THEME}\n${message}${END_COLOR}\n"
 }
 
 # Ecoa mensagem de erro em erro padrão e código do erro em saída padrão
@@ -452,12 +454,20 @@ function run {
         filename="$name"
     fi
 
+    if [ "${filename//\//}" != "$filename" ]; then # --filename tem barra no nome
+        return $(m="Erro! --filename não pode contem barras no nome" e="$ERR_INVALID_FILENAME" helperr)
+    fi
+
     if [ -z "$dirname" ]; then
         if [ "$(id -u)" = "0" ]; then
             dirname="/usr/share/applications"
         else
             dirname="$HOME/.local/share/applications"
         fi
+    fi
+
+    if ! [ -d "$dirname" ]; then
+        return $(m="Erro! --dirname inválido" e="$ERR_INVALID_DIRNAME" helperr)
     fi
 
     dirname="$(dirname "$dirname")/$(basename "$dirname")"

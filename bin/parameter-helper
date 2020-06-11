@@ -130,7 +130,7 @@
 #
 #     source parameter-helper --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20
 #
-#     echo "${__v1[@]}" # Ecoa array vazio do parâmetro v1
+#     echo "${__v1[@]}" # Ecoa array vazio do parâmetro --v1
 #
 #     if [ "$__nomes_exists" = 1 ]; then # Se o parâmetro --nomes foi passado
 #         echo "${__nomes[@]}" # Este código não seria executado
@@ -142,16 +142,16 @@
 #
 # Exemplo 2:
 #
-#     source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20
+#     source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ --nomes Emanuel Pedro
 #
 #     echo "${v1[@]}" # Ecoa array vazio do parâmetro --v1
 #
 #     if [ "$nomes_exists" = 1 ]; then # Se o parâmetro --nomes foi passado
-#         echo "${nomes[@]}" # Este código não seria executado
+#         echo "${nomes[@]}" # Ecoa array com as idades '18' e '20'
 #     fi
 #
 #     if [ "$idades_exists" = 1 ]; then # Se o parâmetro -idades foi passado
-#         echo "${idades[@]}" # Ecoa array com as idades '18' e '20'
+#         echo "${idades[@]}" # Este código não seria executado
 #     fi
 #
 # Exemplo 3:
@@ -219,16 +219,26 @@
 #         echo "${nomes[@]}"
 #     fi
 #
-# Exemplo 8: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)
-#     IFS=$'+' # Define o separador do sistema
+# Exemplo 8:
+#     # Forma de uso NÃO recomendada, pois os argumentos com string vazias
+#     # podem ser ignoradas nesta forma de uso caso o --sep seja um
+#     # "espaçamento". Além disso, o separador precisa ser definido como um
+#     # único caracter. Recomenda-se o uso do utilitário "shut_util_array"
+#     # para a criação de arrays sem essas limitações
 #
-#     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro'
-#     nomes=($(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro))
+#     IFS=$'\n' # Definindo o separador do sistema para a quebra de linha
 #
-#     IFS=$'\n' # Define o separador do sistema
+#     # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta
+#     # forma de uso, o segundo valor é ignorado pois é uma string vazia
+#     # ao mesmo tempo que o separador é um "espaçamento" (quebra de linha))
+#     nomes=($(parameter-helper --out --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes Emanuel "" Pedro))
 #
-#     # Array de tamanho 2 com os valores '20' e '40' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)
-#     idades=($(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades 20 40 --nomes "" Emanuel Pedro))
+#     IFS='+' # Redefinindo o separador do sistema para um não "espaçamento"
+#
+#     # Array de tamanho 3 com os valores 'Emanuel', '' e 'Pedro' (usando
+#     # esta forma de uso, para que o segundo valor seja lido como uma string
+#     # vazia, o --sep precisa ser definido como um não "espaçamento")
+#     nomes=($(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes Emanuel "" Pedro))
 #
 #     IFS=' ' # Volta ao separador padrão do sistema
 #
@@ -387,7 +397,7 @@ function shut_parameterHelper_module {
         echo
         echo "    source parameter-helper --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20"
         echo
-        echo "    echo \"\${__v1[@]}\" # Ecoa array vazio do parâmetro v1"
+        echo "    echo \"\${__v1[@]}\" # Ecoa array vazio do parâmetro --v1"
         echo
         echo "    if [ \"\$__nomes_exists\" = 1 ]; then # Se o parâmetro --nomes foi passado"
         echo "        echo \"\${__nomes[@]}\" # Este código não seria executado"
@@ -399,16 +409,16 @@ function shut_parameterHelper_module {
         echo
         echo "Exemplo 2:"
         echo
-        echo "    source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ -idades 18 20"
+        echo "    source parameter-helper --uremove --create-global-args --create-global-exists --params -v1 -nomes idades @@ --nomes Emanuel Pedro"
         echo
-        echo "    echo \"\${v1[@]}\" # Ecoa array vazio do parâmetro v1"
+        echo "    echo \"\${v1[@]}\" # Ecoa array vazio do parâmetro --v1"
         echo
-        echo "    if [ \"\$nomes_exists\" = 1 ]; then # Se o parâmetro nomes foi passado"
-        echo "        echo \"\${nomes[@]}\" # Este código não seria executado"
+        echo "    if [ \"\$nomes_exists\" = 1 ]; then # Se o parâmetro --nomes foi passado"
+        echo "        echo \"\${nomes[@]}\" # Ecoa array com as idades '18' e '20'"
         echo "    fi"
         echo
-        echo "    if [ \"\$idades_exists\" = 1 ]; then # Se o parâmetro idades foi passado"
-        echo "        echo \"\${idades[@]}\" # Ecoa array com as idades '18' e '20'"
+        echo "    if [ \"\$idades_exists\" = 1 ]; then # Se o parâmetro -idades foi passado"
+        echo "        echo \"\${idades[@]}\" # Este código não seria executado"
         echo "    fi"
         echo
         echo "Exemplo 3:"
@@ -476,16 +486,26 @@ function shut_parameterHelper_module {
         echo "        echo \"\${nomes[@]}\""
         echo "    fi"
         echo
-        echo "Exemplo 8: (Forma de uso NÃO recomendada, pois os argumentos com string vazias são ignoradas nesta forma de uso)"
-        echo "    IFS=\$'+' # Define o separador do sistema"
+        echo "Exemplo 8:"
+        echo "    # Forma de uso NÃO recomendada, pois os argumentos com string vazias"
+        echo "    # podem ser ignoradas nesta forma de uso caso o --sep seja um"
+        echo "    # \"espaçamento\". Além disso, o separador precisa ser definido como um"
+        echo "    # único caracter. Recomenda-se o uso do utilitário \"shut_util_array\""
+        echo "    # para a criação de arrays sem essas limitações"
         echo
-        echo "    # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta forma de uso, o primeiro valor é ignorado pois é uma string vazia)"
-        echo "    nomes=(\$(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro))"
+        echo "    IFS=$'\n' # Definindo o separador do sistema para a quebra de linha"
         echo
-        echo "    IFS=\$'\n' # Define o separador do sistema"
+        echo "    # Array de tamanho 2 com os valores 'Emanuel' e 'Pedro' (usando esta"
+        echo "    # forma de uso, o segundo valor é ignorado pois é uma string vazia"
+        echo "    # ao mesmo tempo que o separador é um \"espaçamento\" (quebra de linha))"
+        echo "    nomes=(\$(parameter-helper --out --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes Emanuel \"\" Pedro))"
         echo
-        echo "    # Array de tamanho 2 com os valores '20' e '40'"
-        echo "    idades=(\$(parameter-helper --out --index 2 --params -v1 -nomes idades @@ -idades 20 40 --nomes \"\" Emanuel Pedro))"
+        echo "    IFS='+' # Redefinindo o separador do sistema para um não \"espaçamento\""
+        echo
+        echo "    # Array de tamanho 3 com os valores 'Emanuel', '' e 'Pedro' (usando"
+        echo "    # esta forma de uso, para que o segundo valor seja lido como uma string"
+        echo "    # vazia, o --sep precisa ser definido como um não \"espaçamento\")"
+        echo "    nomes=(\$(parameter-helper --out --sep + --index 1 --params -v1 -nomes idades @@ -idades 20 40 --nomes Emanuel \"\" Pedro))"
         echo
         echo "    IFS=' ' # Volta ao separador padrão do sistema"
         echo
@@ -750,7 +770,7 @@ function shut_parameterHelper_module {
                                     global_variable_name="$(shut_util_remove_begin_underlines "$global_variable_name")" # Remove as underlines do início do nome da variável
                                 fi
                                 eval len_global_variable_name='${#'$global_variable_name'[@]}'              # Tamanho do array global para os valores deste parâmetro
-                                eval $global_variable_name[$len_global_variable_name]="$a"                  # O array global para os valores deste parâmetro é inicializado com nenhum valor
+                                eval $global_variable_name[$len_global_variable_name]='"$a"'                # O array global para os valores deste parâmetro é inicializado com nenhum valor
                             fi
                         fi
 
