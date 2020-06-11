@@ -59,7 +59,7 @@
 #     --index: Posição do parâmetro na qual será retornado seus
 #         valores. Valor padrão: 0
 #     --out: Exibe os valores do parâmetro da posição --index na
-#         saída padrão
+#         saída padrão. Opcional
 #     --exists: Lança erro se o parâmetro de --index não foi
 #         passado pelo usuário. Encerra a aplicação com sucesso
 #         caso o parâmetro foi passado. Opcional
@@ -106,7 +106,7 @@
 #         do bash antes deste script ser chamado. Opcional
 #     --uremove: Flag responsável por remover as underlines iniciais das
 #         variáveis globais criadas pelos parâmetros --create-global-args e
-#         --create-global-exists
+#         --create-global-exists. Opcional
 #     --create-array-args: Nome do array global que conterá os valores de
 #         cada parâmetro declarado em --params. Cada posição do array
 #         refere-se a um parâmetro na mesma posição que ele foi declarado
@@ -122,7 +122,7 @@
 #         houver valor para ele, o nome do array será
 #         "shut_parameterHelper_exists". Opcional
 #     --no-strict: Impede o lançamento de erro por parâmetro
-#         desconhecido
+#         desconhecido. Opcional
 #     @@: Informa que os argumentos começarão a ser analizados.
 #         Obrigatório
 #
@@ -322,11 +322,11 @@ function shut_parameterHelper_module {
         echo
         echo "Parâmetros:"
         echo "    --help: Mostra todas as opções. Opcional"
-        echo "    --version: Mostra a versão atual deste script"
+        echo "    --version: Mostra a versão atual deste script. Opcional"
         echo "    --index: Posição do parâmetro na qual será retornado seus"
         echo "        valores. Valor padrão: 0"
         echo "    --out: Exibe os valores do parâmetro da posição --index na"
-        echo "        saída padrão"
+        echo "        saída padrão. Opcional"
         echo "    --exists: Lança erro se o parâmetro de --index não foi"
         echo "        passado pelo usuário. Encerra a aplicação com sucesso"
         echo "        caso o parâmetro foi passado. Opcional"
@@ -373,7 +373,7 @@ function shut_parameterHelper_module {
         echo "        do bash antes deste script ser chamado. Opcional"
         echo "    --uremove: Flag responsável por remover as underlines iniciais das"
         echo "        variáveis globais criadas pelos parâmetros --create-global-args e"
-        echo "        --create-global-exists"
+        echo "        --create-global-exists. Opcional"
         echo "    --create-array-args: Nome do array global que conterá os valores de"
         echo "        cada parâmetro declarado em --params. Cada posição do array"
         echo "        refere-se a um parâmetro na mesma posição que ele foi declarado"
@@ -389,7 +389,7 @@ function shut_parameterHelper_module {
         echo "        houver valor para ele, o nome do array será"
         echo "        \"shut_parameterHelper_exists\". Opcional"
         echo "    --no-strict: Impede o lançamento de erro por parâmetro"
-        echo "        desconhecido"
+        echo "        desconhecido. Opcional"
         echo "    @@: Informa que os argumentos começarão a ser analizados."
         echo "        Obrigatório"
         echo

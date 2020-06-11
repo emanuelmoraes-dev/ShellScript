@@ -13,14 +13,14 @@ VERSION=2.0.0
 #
 # Parâmetros Nomeados:
 #     --help: Mostra todas as opções. Opcional
-#     --version: Mostra a versão atual deste script
+#     --version: Mostra a versão atual deste script. Opcional
 #     --lang: Define a linguagem na qual o --name e o --comment devem ser
 #         exibidos. --lang APENAS será aplicado nos argumentos definidos
 #         APÓS este. Se não passado, a linguagem não será definida e os
 #         parâmetros --name e --comment se definirão como valor padrão.
 #         Opcional
-#     --name: Nome da aplicação a ser exibido no menu. Opcional
-#     --exec: Comando de execução da aplicação. Opcional (é altamente
+#     --name: Nome da aplicação a ser exibido no menu. Obrigatório
+#     --exec: Comando de execução da aplicação. Obrigatório (é altamente
 #         recomendado que flags, como o %f, não sejam inseridos aqui.
 #         Caso alguma flag seja necessária, insira ela no parâmetro
 #         --flag-exec)
@@ -40,7 +40,8 @@ VERSION=2.0.0
 #         conteúdo que seria gerado no arquivo é exibido na saída padrão.
 #         Opcional
 #     --replace-file: Se esta flag for informada e se já ouver um arquivo
-#         .desktop, tal arquivo será reescrito, ao invés de concatenado
+#         .desktop, tal arquivo será reescrito, ao invés de concatenado.
+#         Opcional
 #
 # Atalhos:
 #     -n = --name
@@ -125,14 +126,14 @@ function helpout {
     echo
     echo "Parâmetros Nomeados:"
     echo "    --help: Mostra todas as opções. Opcional"
-    echo "    --version: Mostra a versão atual deste script"
+    echo "    --version: Mostra a versão atual deste script. Opcional"
     echo "    --lang: Define a linguagem na qual o --name e o --comment devem ser"
     echo "        exibidos. --lang APENAS será aplicado nos argumentos definidos"
     echo "        APÓS este. Se não passado, a linguagem não será definida e os"
     echo "        parâmetros --name e --comment se definirão como valor padrão."
     echo "        Opcional"
-    echo "    --name: Nome da aplicação a ser exibido no menu. Opcional"
-    echo "    --exec: Comando de execução da aplicação. Opcional (é altamente"
+    echo "    --name: Nome da aplicação a ser exibido no menu. Obrigatório"
+    echo "    --exec: Comando de execução da aplicação. Obrigatório (é altamente"
     echo "        recomendado que flags, como o %f, não sejam inseridos aqui. "
     echo "        Caso alguma flag seja necessária, insira ela no parâmetro"
     echo "        --flag-exec)"
@@ -152,7 +153,8 @@ function helpout {
 	echo "        conteúdo que seria gerado no arquivo é exibido na saída padrão."
     echo "        Opcional"
     echo "    --replace-file: Se esta flag for informada e se já ouver um arquivo"
-    echo "        .desktop, tal arquivo será reescrito, ao invés de concatenado"
+    echo "        .desktop, tal arquivo será reescrito, ao invés de concatenado."
+    echo "        Opcional"
     echo
     echo "Atalhos:"
     echo "    -n = --name"
