@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIRNAME="$(pwd)"
+DIRNAME="$(dirname "$0")"
 
 # NOME DAS LIBS GLOBAIS A SEREM IMPORTADAS
 PARAMETER_HELPER_NAME="parameter-helper"

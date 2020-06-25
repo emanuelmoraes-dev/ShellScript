@@ -1,8 +1,8 @@
 #!/bin/bash
 
-VERSION=2.0.1
+VERSION=2.0.2
 
-# gendesk@2.0.1
+# gendesk@2.0.2
 #
 # Script responsável por criar um lançador de aplicativo para uma aplicação
 # qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo
@@ -244,7 +244,7 @@ function helperr {
 # Joga na variável global PARAMETER_HELPER o nome da lib que tratará os
 # argumentos passados pelo usuário
 function get_parameter_helper {
-    local DIRNAME="$(pwd)"
+    local DIRNAME="$(dirname "$0")"
     PARAMETER_HELPER="$DIRNAME/parameter-helper"
 
     if ! [ -f "$PARAMETER_HELPER" ]; then
