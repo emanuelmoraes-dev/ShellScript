@@ -1,8 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-VERSION=2.0.2
+VERSION=2.1.0
 
-# gendesk@2.0.2
+# gendesk@2.1.0
 #
 # Script responsável por criar um lançador de aplicativo para uma aplicação
 # qualquer no menu do sistema. Se for root, por padrão, cria-se o arquivo
@@ -241,17 +241,18 @@ function helperr {
     echo $err
 }
 
-# Joga na variável global PARAMETER_HELPER o nome da lib que tratará os
-# argumentos passados pelo usuário
-function get_parameter_helper {
+# Joga na variável global (o nome da variável está no $1) o caminho da lib.
+# O nome da lib encontra-se no $2.
+function import_lib {
     local DIRNAME="$(dirname "$0")"
-    PARAMETER_HELPER="$DIRNAME/parameter-helper"
+    local LOCAL_PATH="$DIRNAME/$2"
+    eval "$1"="$LOCAL_PATH"
 
-    if ! [ -f "$PARAMETER_HELPER" ]; then
-        if type -P "$PARAMETER_HELPER_NAME" 1>/dev/null 2>/dev/null; then
-            PARAMETER_HELPER="$PARAMETER_HELPER_NAME"
+    if ! [ -f "$LOCAL_PATH" ]; then
+        if which "$2" 1>/dev/null 2>/dev/null; then
+            eval "$1"="$2"
         else
-            return $(m="Erro! \"$PARAMETER_HELPER_NAME\"" e=$ERR_NOT_FOUND_PARAMETER_HELPER helperr)
+            return $ERR_UNEXPECTED
         fi
     fi
 }
@@ -269,7 +270,7 @@ function adapter {
         fi
     fi
 
-    if [ "$2" = "--is-exec" ] && ! type -P "$rt" 1>/dev/null 2>/dev/null; then
+    if [ "$2" = "--is-exec" ] && ! which "$rt" 1>/dev/null 2>/dev/null; then
         rt="$1"
     elif [ -f "$rt" ]; then
         rt="${rt// /\\ }"
@@ -484,7 +485,7 @@ function run {
         desktop_entry="$(cat "$dirname/$filename.desktop")"
     fi
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"[Desktop Entry]\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep '\[Desktop Entry\]')" ]; then
         if [ "$present_replace_file" = 0 ] && [ -f "$dirname/$filename.desktop" ]; then
             desktop_entry="${desktop_entry}${endl}[Desktop Entry]"
         else
@@ -492,15 +493,15 @@ function run {
         fi
     fi
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Encoding=\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep 'Encoding=')" ]; then
         desktop_entry="${desktop_entry}${endl}Encoding=UTF-8"
     fi
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Type=\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep 'Type=')" ]; then
         desktop_entry="${desktop_entry}${endl}Type=Application"
     fi
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Terminal=\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep 'Terminal=')" ]; then
         desktop_entry="${desktop_entry}${endl}Terminal=false"
     fi
 
@@ -533,7 +534,7 @@ function main {
 
     # Joga na variável global PARAMETER_HELPER o nome da lib que tratará os
     # argumentos passados pelo usuário
-    get_parameter_helper || return $?
+    import_lib PARAMETER_HELPER $PARAMETER_HELPER_NAME || return $(m="Erro! \"$PARAMETER_HELPER_NAME\" Não Encontrado!" e=$ERR_NOT_FOUND_PARAMETER_HELPER helperr)
 
     # Obtém as libs importados pelo próprio PARAMETER_HELPER
     source $PARAMETER_HELPER --no-strict
@@ -544,7 +545,7 @@ function main {
     local lang_args="" # Argumento --lang <vlang> a ser passado para run
 
     while [ "${#args[@]}" -gt 0 ]; do
-        index_lang=$(shut_util_findex "--lang" "${args[@]}") #index da primeira ocorrência de --lang
+        index_lang=$(shut_util_findex "--lang" "${args[@]}") # Posição da primeira ocorrência de --lang
 
         if [ "$index_lang" != "-1" ]; then
             iargs=("${args[@]:0:index_lang}")
@@ -577,11 +578,11 @@ function main {
 
     # Verificando existência de argumentos obrigatórios
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep -E \"Name=|Name\[.*\]=\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep -E 'Name=|Name\[.*\]=')" ]; then
         return $(m="Erro! O parâmetro --name é obrigatório!" e=$ERR_NOT_FOUND_NAME helperr -v)
     fi
 
-    if ! [ "$(bash -c "echo \"$desktop_entry\" | grep \"Exec=\"")" ]; then
+    if ! [ "$(echo "$desktop_entry" | grep 'Exec=')" ]; then
         return $(m="Erro! O parâmetro --exec é obrigatório!" e=$ERR_NOT_FOUND_EXEC helperr -v)
     fi
 
